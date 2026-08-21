@@ -2,32 +2,165 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta http-equiv="refresh" content="0;url=http://localhost:3000">
-  <title>BotClientes - Live Preview Redirection</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LeadRadar PRO - Live Preview & Prospecção B2B</title>
+  <link rel="icon" href="https://fav.farm/🚀" />
   <style>
-    html, body {
+    * {
+      box-sizing: border-box;
       margin: 0;
       padding: 0;
+    }
+    html, body {
       width: 100%;
       height: 100%;
       overflow: hidden;
-      background-color: #020617;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background-color: #080b11;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      color: #f1f5f9;
     }
-    iframe {
+    #top-bar {
+      height: 42px;
+      background: #0f172a;
+      border-bottom: 1px solid #1e293b;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      font-size: 12px;
+      z-index: 9999;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 700;
+      color: #e2e8f0;
+    }
+    .badge-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 3px 10px;
+      border-radius: 9999px;
+      background: rgba(16, 185, 129, 0.15);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      font-weight: 600;
+      font-size: 11px;
+    }
+    .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #10b981;
+      box-shadow: 0 0 8px #10b981;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.85); }
+    }
+    .actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn {
+      padding: 5px 12px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s;
+      border: 1px solid #334155;
+      background: #1e293b;
+      color: #cbd5e1;
+    }
+    .btn:hover {
+      background: #334155;
+      color: #ffffff;
+    }
+    .btn-primary {
+      background: #4f46e5;
+      border-color: #6366f1;
+      color: #ffffff;
+    }
+    .btn-primary:hover {
+      background: #4338ca;
+    }
+    #preview-frame {
       width: 100%;
-      height: 100%;
+      height: calc(100% - 42px);
       border: none;
+      background: #080b11;
     }
   </style>
-  <script>
-    // If opened directly in browser, redirect immediately to Next.js port 3000
-    if (window.top === window.self) {
-      window.location.replace("http://localhost:3000");
-    }
-  </script>
 </head>
 <body>
-  <iframe src="http://localhost:3000" title="BotClientes App"></iframe>
+  <div id="top-bar">
+    <div class="brand">
+      <span>🚀 LeadRadar PRO</span>
+      <span class="badge-status">
+        <span class="dot"></span>
+        <span id="status-text">Live Preview Conectado</span>
+      </span>
+    </div>
+    <div class="actions">
+      <button class="btn" onclick="toggleSource()" id="btn-toggle">Alternar: Local / Vercel</button>
+      <a href="https://botclientes.vercel.app" target="_blank" rel="noopener noreferrer" class="btn btn-primary">
+        Abrir em Nova Aba ↗
+      </a>
+    </div>
+  </div>
+
+  <iframe
+    id="preview-frame"
+    src="https://botclientes.vercel.app"
+    title="LeadRadar PRO Live Preview"
+    allow="clipboard-read; clipboard-write; geolocation; microphone; camera"
+  ></iframe>
+
+  <script>
+    const vercelUrl = "https://botclientes.vercel.app";
+    const localUrl = "http://localhost:3000";
+    const frame = document.getElementById("preview-frame");
+    const statusText = document.getElementById("status-text");
+    const btnToggle = document.getElementById("btn-toggle");
+
+    let currentSource = "vercel";
+
+    // Test if localhost:3000 is accessible
+    fetch("http://localhost:3000", { mode: 'no-cors' })
+      .then(() => {
+        // Localhost is online
+        currentSource = "local";
+        frame.src = localUrl;
+        statusText.textContent = "Servidor Local (Porta 3000)";
+        btnToggle.textContent = "Usar Nuvem (Vercel)";
+      })
+      .catch(() => {
+        // Localhost offline, using Vercel production
+        currentSource = "vercel";
+        frame.src = vercelUrl;
+        statusText.textContent = "Live Cloud (Vercel)";
+        btnToggle.textContent = "Usar Servidor Local";
+      });
+
+    function toggleSource() {
+      if (currentSource === "vercel") {
+        currentSource = "local";
+        frame.src = localUrl;
+        statusText.textContent = "Servidor Local (Porta 3000)";
+        btnToggle.textContent = "Usar Nuvem (Vercel)";
+      } else {
+        currentSource = "vercel";
+        frame.src = vercelUrl;
+        statusText.textContent = "Live Cloud (Vercel)";
+        btnToggle.textContent = "Usar Servidor Local";
+      }
+    }
+  </script>
 </body>
 </html>
