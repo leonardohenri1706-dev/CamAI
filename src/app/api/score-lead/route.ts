@@ -44,21 +44,32 @@ export async function POST(req: Request) {
                 'Authorization': `Bearer ${openrouterKey.trim()}`,
                 'Content-Type': 'application/json',
                 'HTTP-Referer': 'http://localhost:3000',
-                'X-Title': 'LeadPulse B2B Prospector',
+                'X-Title': 'BotClientes Prospector AI',
               },
               body: JSON.stringify({
                 model: openrouterModel || 'openai/gpt-4o-mini',
                 messages: [
                   {
                     role: 'system',
-                    content: `Você é um copywriter B2B sênior especializado em mensagens curtas, humanizadas e de alta conversão para WhatsApp Web para pequenos empresários locais.
-Escreva uma mensagem de WhatsApp direta e persuasiva citando o nome do estabelecimento (${lead.displayName}), suas avaliações (${lead.digitalHealth.rating} estrelas no Google) e a proposta de valor do produto (${repoAnalysis.coreValueProp}).
-Tom desejado: ${pitchTone || 'consultivo'}.
-Retorne apenas o texto da mensagem formatada para WhatsApp (com emojis pontuais e *negritos*). Não use placeholders.`,
+                    content: `Você é um especialista em Copywriting B2B de altíssima conversão para WhatsApp Web no Brasil.
+Escreva uma mensagem extremamente bem estruturada e organizada para o responsável do estabelecimento "*${lead.displayName}*".
+
+A mensagem DEVE seguir a seguinte estrutura obrigatória:
+1. Saudação personalizada com elogio e prova social (${lead.digitalHealth.rating}★ com ${lead.digitalHealth.reviewsCount} avaliações no Google).
+2. Título "*BENEFÍCIOS REAIS DO NOSSO PRODUTO:*" com marcadores destacando:
+   - 💰 Economia de 12% a 27% de comissão.
+   - ⚡ Atendimento 100% automático no WhatsApp.
+   - 🎯 Vendas diretas pela própria marca.
+3. Link de demonstração em destaque: "👉 *Clique para Testar a Demonstração ao Vivo:* https://botclientes.vercel.app".
+4. *MÚLTIPLOS CTAS (Chamadas de Ação):*
+   - 👉 Responda "SIM" para receber a versão grátis com a marca da empresa.
+   - 👉 Ou me diga o melhor horário para um bate-papo rápido de 3 minutos hoje.
+
+Retorne apenas o texto final formatado para WhatsApp com emojis e *negritos*. Não use placeholders.`,
                   },
                 ],
-                max_tokens: 250,
-                temperature: 0.7,
+                max_tokens: 450,
+                temperature: 0.6,
               }),
             });
 
