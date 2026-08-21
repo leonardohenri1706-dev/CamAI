@@ -349,8 +349,6 @@ export default function SearchFilters() {
       {/* Header & Unified Search Title */}
       <div className="space-y-1">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2 text-sm font-extrabold text-slate-100">
-            <span className="p-1.5 rounded-lg bg-gradient-to-r from-pink-500 to-purple-600 text-white">
           <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-indigo-950/80 text-indigo-400 border border-indigo-800/50 text-xs font-bold">
             <Search className="w-3.5 h-3.5" /> Busca de Estabelecimentos Comerciais & Redes Sociais
           </span>
