@@ -294,38 +294,43 @@ export default function LeadDetailDrawer() {
               </div>
             </div>
 
-            {/* Section 3: WhatsApp Sales Pitch Generator */}
+            {/* Section 3: WhatsApp Sales Pitch Generator with 3 Dedicated Approaches */}
             <div className="glass-card rounded-2xl p-4 border border-slate-800 space-y-3">
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <h4 className="font-bold text-sm text-slate-200 flex items-center gap-2">
-                  <MessageSquare className="w-4 h-4 text-emerald-400" /> Pitch de Vendas Personalizado
+                  <MessageSquare className="w-4 h-4 text-emerald-400" /> Pitch de Vendas com IA (3 Abordagens)
                 </h4>
 
-                {/* Tone selector */}
-                <div className="flex items-center gap-1 bg-slate-950 p-1 rounded-xl border border-slate-800 text-xs">
+                {/* 3 Dedicated Approaches Selector */}
+                <div className="flex items-center gap-1 bg-slate-950 p-1 rounded-xl border border-slate-800 text-[11px]">
                   <button
-                    onClick={() => handleToneChange('consultive')}
-                    className={`px-2.5 py-1 rounded-lg transition-all ${
-                      pitchTone === 'consultive' ? 'bg-indigo-950 text-indigo-300 font-bold border border-indigo-800' : 'text-slate-400 hover:text-slate-200'
-                    }`}
+                    onClick={() => {
+                      const directPitch = `Olá, tudo bem? Me chamo ${apiSettings.devName || 'Leonardo'}.\n\nVi o destaque da *${selectedLead.displayName}* em ${selectedLead.city} e notei uma grande oportunidade comercial.\n\nDesenvolvemos uma solução especializada em *${selectedLead.category}* que permite automatizar o atendimento e receber pedidos diretos no WhatsApp sem repassar comissões.\n\nPodemos agendar uma rápida apresentação de 5 minutos esta semana?`;
+                      updateLeadPitch(selectedLead.id, directPitch);
+                    }}
+                    className="px-2 py-1 rounded-lg bg-indigo-950/80 hover:bg-indigo-900 text-indigo-300 border border-indigo-800/60 font-semibold transition-all"
                   >
-                    Consultivo
+                    🚀 Direta
                   </button>
                   <button
-                    onClick={() => handleToneChange('direct')}
-                    className={`px-2.5 py-1 rounded-lg transition-all ${
-                      pitchTone === 'direct' ? 'bg-indigo-950 text-indigo-300 font-bold border border-indigo-800' : 'text-slate-400 hover:text-slate-200'
-                    }`}
+                    onClick={() => {
+                      const painPitch = !selectedLead.digitalHealth.hasWebsite
+                        ? `Olá ${selectedLead.displayName}! Tudo bem?\n\nEstava pesquisando os melhores estabelecimentos de ${selectedLead.city} e notei que vocês ainda não possuem um website próprio estruturado para pedidos.\n\nIsso faz muitos clientes irem para concorrentes ou plataformas que cobram até 27% de taxas. Criamos uma plataforma direta para resolver isso.\n\nFaz sentido conversarmos sobre como capturar esses clientes?`
+                        : `Olá ${selectedLead.displayName}!\n\nParabéns pela nota de ${selectedLead.digitalHealth.rating} estrelas no Google Maps (${selectedLead.digitalHealth.reviewsCount} avaliações)!\n\nIdentificamos como converter essas visualizações em vendas diretas e fidelização via WhatsApp.\n\nPodemos trocar uma rápida ideia hoje?`;
+                      updateLeadPitch(selectedLead.id, painPitch);
+                    }}
+                    className="px-2 py-1 rounded-lg bg-amber-950/80 hover:bg-amber-900 text-amber-300 border border-amber-800/60 font-semibold transition-all"
                   >
-                    Direto
+                    🎯 Dores Reais
                   </button>
                   <button
-                    onClick={() => handleToneChange('promotional')}
-                    className={`px-2.5 py-1 rounded-lg transition-all ${
-                      pitchTone === 'promotional' ? 'bg-indigo-950 text-indigo-300 font-bold border border-indigo-800' : 'text-slate-400 hover:text-slate-200'
-                    }`}
+                    onClick={() => {
+                      const shortPitch = `Olá ${selectedLead.displayName}, tudo bem? Vi o perfil de vocês em ${selectedLead.neighborhood || selectedLead.city}.\n\nVocês têm 2 minutos para eu apresentar como economizar em taxas e acelerar os pedidos pelo WhatsApp?`;
+                      updateLeadPitch(selectedLead.id, shortPitch);
+                    }}
+                    className="px-2 py-1 rounded-lg bg-emerald-950/80 hover:bg-emerald-900 text-emerald-300 border border-emerald-800/60 font-semibold transition-all"
                   >
-                    Promocional
+                    💬 WhatsApp Curta
                   </button>
                 </div>
               </div>
