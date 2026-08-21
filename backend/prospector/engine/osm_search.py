@@ -3,6 +3,7 @@ import random
 from typing import Dict, Any, List, Optional
 from .phone_verifier import verify_and_format_real_whatsapp
 from .places_database import VERIFIED_PLACES_CATALOG
+from .site_crawler import extract_contacts_from_website
 
 CATEGORY_PHOTO_PRESETS = {
     'Hamburgueria': [
@@ -242,6 +243,12 @@ def search_real_places_with_python(
                             tags.get('contact:phone') or
                             tags.get('phone')
                         )
+
+                        website_url = tags.get('website') or tags.get('contact:website')
+                        if not osm_phone and website_url:
+                            crawled = extract_contacts_from_website(website_url)
+                            if crawled.get('whatsapp_number'):
+                                osm_phone = crawled['whatsapp_number']
 
                         phone_verified = verify_and_format_real_whatsapp(osm_phone) or {
                             'formattedPhone': osm_phone or '(11) 99123-4455',
