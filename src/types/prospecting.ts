@@ -94,6 +94,7 @@ export interface FilterOptions {
   minScore: number;
   categoryFilter: string;
   sourceFilter?: 'all' | 'google_maps' | 'instagram';
+  searchMode?: 'fast' | 'deep';
   sortBy: 'score' | 'reviews' | 'noWebsiteFirst';
   searchQuery: string;
 }

@@ -164,7 +164,8 @@ export default function SearchFilters() {
   const handleSearchLeads = async (
     customQueryText?: string,
     explicitLocation?: SearchLocation,
-    explicitCategory?: string
+    explicitCategory?: string,
+    explicitMode?: 'fast' | 'deep'
   ) => {
     setIsSearchingLeads(true);
     setIsDropdownOpen(false);
@@ -173,6 +174,7 @@ export default function SearchFilters() {
       const targetLoc = explicitLocation || currentLocation;
 
       const activeCategory = explicitCategory || (filters.categoryFilter !== 'Todas' ? filters.categoryFilter : (currentRepo.icp.targetBusinessTypes[0] || 'Hamburgueria'));
+      const activeMode = explicitMode || filters.searchMode || 'fast';
 
       // 1. Search places (via Django Backend or Next API)
       let searchData: any = null;
@@ -184,6 +186,7 @@ export default function SearchFilters() {
             location: targetLoc,
             customQuery: queryToSend,
             category: activeCategory,
+            searchMode: activeMode,
           }),
         });
         searchData = await djangoSearchRes.json();
@@ -196,6 +199,7 @@ export default function SearchFilters() {
             customQuery: queryToSend,
             keywords: currentRepo.searchKeywords,
             category: activeCategory,
+            searchMode: activeMode,
             googlePlacesApiKey: apiSettings.googlePlacesApiKey,
           }),
         });
@@ -326,22 +330,51 @@ export default function SearchFilters() {
           </p>
         </div>
 
-        {/* Search Trigger Button */}
-        <button
-          onClick={() => handleSearchLeads()}
-          disabled={isSearchingLeads}
-          className="w-full lg:w-auto px-6 py-3.5 rounded-xl bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 hover:from-emerald-400 hover:to-cyan-400 text-slate-950 font-extrabold text-sm flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/25 active:scale-95 transition-all disabled:opacity-50 whitespace-nowrap"
-        >
-          {isSearchingLeads ? (
-            <>
-              <Loader2 className="w-4 h-4 animate-spin text-slate-950" /> Buscando no Brasil...
-            </>
-          ) : (
-            <>
-              <Search className="w-4 h-4 text-slate-950" /> Buscar & Analisar Leads (Nacional)
-            </>
-          )}
-        </button>
+        {/* Search Mode Selector: Fast vs Deep (1000+ leads) */}
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="flex items-center gap-1 bg-slate-900/90 border border-slate-800 p-1.5 rounded-xl">
+            <span className="text-[11px] text-slate-400 font-extrabold px-1.5">Modo:</span>
+            {[
+              { label: '⚡ Busca Rápida', val: 'fast', desc: 'Retorno instantâneo dos clientes verificados principais' },
+              { label: '🔥 Busca Profunda (~1000+ Leads)', val: 'deep', desc: 'Varredura mais lenta nas 15 maiores regiões do Brasil' },
+            ].map((mode) => (
+              <button
+                key={mode.val}
+                onClick={() => {
+                  setFilters({ searchMode: mode.val as any });
+                  handleSearchLeads(undefined, undefined, undefined, mode.val as any);
+                }}
+                title={mode.desc}
+                className={`text-xs px-3 py-1.5 rounded-xl font-bold transition-all active:scale-95 flex items-center gap-1 ${
+                  (filters.searchMode || 'fast') === mode.val
+                    ? mode.val === 'deep'
+                      ? 'bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 text-slate-950 font-black shadow-lg shadow-orange-500/20'
+                      : 'bg-gradient-to-r from-cyan-500 to-blue-500 text-slate-950 font-black shadow-lg shadow-cyan-500/20'
+                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800'
+                }`}
+              >
+                {mode.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Search Trigger Button */}
+          <button
+            onClick={() => handleSearchLeads()}
+            disabled={isSearchingLeads}
+            className="w-full lg:w-auto px-6 py-3.5 rounded-xl bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 hover:from-emerald-400 hover:to-cyan-400 text-slate-950 font-extrabold text-sm flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/25 active:scale-95 transition-all disabled:opacity-50 whitespace-nowrap"
+          >
+            {isSearchingLeads ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin text-slate-950" /> {filters.searchMode === 'deep' ? 'Varrendo 15 capitais (~1000+ Leads)...' : 'Buscando no Brasil...'}
+              </>
+            ) : (
+              <>
+                <Search className="w-4 h-4 text-slate-950" /> {filters.searchMode === 'deep' ? 'Executar Busca Profunda' : 'Buscar Leads'}
+              </>
+            )}
+          </button>
+        </div>
       </div>
 
       {/* Add Location Modal / Popover */}
