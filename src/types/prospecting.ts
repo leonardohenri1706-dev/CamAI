@@ -23,6 +23,8 @@ export interface RepoAnalysis {
   searchKeywords: string[];
   solvedPainPoints: string[];
   suggestedCities?: string[];
+  suggestedHashtags?: string[];
+  prospectingPlanSummary?: string;
   analyzedAt?: string;
 }
 
@@ -43,6 +45,10 @@ export interface DigitalHealth {
   instagramProfileUrl?: string;
   instagramFollowers?: number;
   instagramBio?: string;
+  recentPostSnippet?: string;
+  hashtagUsed?: string;
+  postType?: 'post' | 'reels' | 'story' | 'profile';
+  instagramEngagement?: string;
 }
 
 export interface ScoreFactors {

@@ -146,7 +146,7 @@ export default function Home() {
     });
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col selection:bg-cyan-500 selection:text-slate-950">
+    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col selection:bg-indigo-500 selection:text-white">
       {/* Top Header */}
       <Header />
 
@@ -161,7 +161,7 @@ export default function Home() {
             {/* Step 1: Repo / Product ICP Analyzer */}
             <RepoAnalyzer />
 
-            {/* Step 2: Location & Search Filters with Maps Autocomplete */}
+            {/* Step 2: Location & Search Filters */}
             <SearchFilters />
 
             {/* Step 3: Split View - Dynamic Interactive Map + Leads Feed */}
@@ -169,12 +169,12 @@ export default function Home() {
               {/* Left Column: Interactive Map & Live Pins */}
               <div className="lg:col-span-5 space-y-3 sticky top-24">
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-xs font-semibold text-slate-300">
-                    <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
-                    <span>Mapa de Cobertura Nacional • Brasil</span>
+                  <div className="flex items-center gap-2 text-xs font-bold text-slate-300">
+                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                    <span>Mapeamento Geográfico & Densidade • Brasil</span>
                   </div>
-                  <span className="text-[11px] text-slate-400">
-                    {filteredLeads.length} estabelecimentos reais
+                  <span className="text-[11px] text-slate-400 font-mono">
+                    {filteredLeads.length} estabelecimentos mapeados
                   </span>
                 </div>
 
@@ -185,11 +185,11 @@ export default function Home() {
               <div className="lg:col-span-7 space-y-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <h3 className="font-bold text-sm text-slate-100 flex items-center gap-1.5">
-                      <Sparkles className="w-4 h-4 text-cyan-400" />
-                      Oportunidades Ranqueadas
+                    <h3 className="font-extrabold text-sm text-slate-100 flex items-center gap-1.5">
+                      <Zap className="w-4 h-4 text-indigo-400" />
+                      Empresas Ranqueadas por Oportunidade
                     </h3>
-                    <span className="text-[11px] px-2 py-0.5 rounded-full bg-cyan-950 text-cyan-400 border border-cyan-800 font-mono">
+                    <span className="text-[11px] px-2 py-0.5 rounded-md bg-indigo-950 text-indigo-300 border border-indigo-800 font-mono font-bold">
                       {filteredLeads.length} leads
                     </span>
                   </div>
@@ -199,9 +199,9 @@ export default function Home() {
                 {filteredLeads.length === 0 ? (
                   <div className="glass-panel rounded-2xl p-12 text-center border border-slate-800 space-y-3">
                     <Building className="w-8 h-8 text-slate-600 mx-auto" />
-                    <h4 className="font-semibold text-slate-300 text-sm">Nenhum estabelecimento encontrado</h4>
+                    <h4 className="font-bold text-slate-300 text-sm">Nenhum estabelecimento encontrado com os filtros atuais</h4>
                     <p className="text-xs text-slate-500 max-w-sm mx-auto">
-                      Digite uma cidade no campo de localização acima ou selecione outro nicho para buscar no mapa.
+                      Digite uma cidade, hashtag ou selecione outro nicho para buscar no radar de prospecção.
                     </p>
                   </div>
                 ) : (

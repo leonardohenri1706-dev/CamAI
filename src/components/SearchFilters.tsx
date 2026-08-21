@@ -312,46 +312,148 @@ export default function SearchFilters() {
     }
   };
 
+  // Query type detection helper
+  const getQueryTypeBadge = () => {
+    const val = customCityInput.trim();
+    if (!val) return null;
+    if (val.startsWith('#')) {
+      return (
+        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-pink-950 text-pink-300 border border-pink-700/60 font-mono text-xs font-bold animate-in fade-in">
+          📌 Hashtag Instagram ({val})
+        </span>
+      );
+    }
+    if (val.startsWith('@')) {
+      return (
+        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-purple-950 text-purple-300 border border-purple-700/60 font-mono text-xs font-bold animate-in fade-in">
+          📸 Perfil Instagram ({val})
+        </span>
+      );
+    }
+    if (val.toLowerCase().includes('post') || val.toLowerCase().includes('reels') || val.toLowerCase().includes('instagram')) {
+      return (
+        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-cyan-950 text-cyan-300 border border-cyan-700/60 text-xs font-bold animate-in fade-in">
+          ✨ Posts & Conteúdo IA
+        </span>
+      );
+    }
+    return (
+      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-slate-900 text-cyan-400 border border-slate-700 text-xs font-medium animate-in fade-in">
+        📍 Busca Comercial & PME Local
+      </span>
+    );
+  };
+
   return (
-    <div className="w-full glass-panel rounded-2xl p-4 border border-slate-800/80 shadow-lg space-y-3">
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-        {/* Nationwide Prospecting Header */}
-        <div className="flex-1 space-y-2">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 text-xs font-bold text-slate-100">
-              <Globe className="w-4 h-4 text-emerald-400" />
-              <span>Etapa 2: Prospecção Nacional de Clientes em Potencial (Todo o Brasil)</span>
+    <div className="w-full glass-panel rounded-2xl p-5 border border-slate-800/80 shadow-2xl space-y-4">
+      {/* Header & Unified Search Title */}
+      <div className="space-y-1">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2 text-sm font-extrabold text-slate-100">
+            <span className="p-1.5 rounded-lg bg-gradient-to-r from-pink-500 to-purple-600 text-white">
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-indigo-950/80 text-indigo-400 border border-indigo-800/50 text-xs font-bold">
+            <Search className="w-3.5 h-3.5" /> Busca de Estabelecimentos Comerciais & Redes Sociais
+          </span>
+          <span className="text-[11px] text-slate-400 font-mono">
+            {locations.length} Localizações Pré-Mapeadas
+          </span>
+        </div>
+        <p className="text-xs text-slate-400">
+          Pesquise por <strong>hashtags (#delivery)</strong>, <strong>perfis (@usuario)</strong>, <strong>categoria</strong> ou <strong>cidade/DDD</strong> em todo o Brasil.
+        </p>
+      </div>
+
+      {/* Unified Search Input Bar */}
+      <div className="relative" ref={searchContainerRef}>
+        <div className="flex flex-col md:flex-row items-stretch gap-2">
+          {/* Main Input Box */}
+          <div className="relative flex-1">
+            <div className="absolute left-3.5 top-1/2 -translate-y-1/2 flex items-center gap-1.5 text-slate-400 pointer-events-none">
+              <Search className="w-4 h-4 text-indigo-400" />
             </div>
-            <span className="text-[11px] text-emerald-400 font-extrabold flex items-center gap-1 bg-emerald-950/80 border border-emerald-700/60 px-2.5 py-0.5 rounded-full">
-              <CheckCircle2 className="w-3 h-3 text-emerald-400" /> Cobertura Nacional Ativa
-            </span>
+
+            <input
+              type="text"
+              value={customCityInput}
+              onChange={(e) => handleInputChange(e.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder="Digite cidade, nicho, hashtag #... ou @perfil (ex: #hamburgueriasp ou Fortaleza)"
+              className="w-full pl-10 pr-28 py-3 rounded-xl bg-slate-950 border border-slate-700/80 text-sm text-slate-100 placeholder:text-slate-500 font-sans focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all"
+            />
+
+            {/* Dynamic Type Badge inside input right */}
+            <div className="absolute right-3 top-1/2 -translate-y-1/2 hidden sm:block">
+              {getQueryTypeBadge()}
+            </div>
           </div>
 
-          <p className="text-xs text-slate-400">
-            A busca vasculha o Brasil inteiro sem restrição de localização para encontrar e ranquear os melhores estabelecimentos comerciais.
-          </p>
-        </div>
-
-        {/* Unified Search Action Button */}
-        <div className="flex flex-wrap items-center gap-2">
+          {/* Search Button */}
           <button
             onClick={() => handleSearchLeads()}
             disabled={isSearchingLeads}
-            className="w-full lg:w-auto px-6 py-3.5 rounded-xl bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 hover:from-emerald-400 hover:to-cyan-400 text-slate-950 font-black text-sm flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/25 active:scale-95 transition-all disabled:opacity-50 whitespace-nowrap"
+            className="px-6 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm flex items-center justify-center gap-2 shadow-md active:scale-95 transition-all disabled:opacity-50 whitespace-nowrap shrink-0"
           >
             {isSearchingLeads ? (
               <>
-                <Loader2 className="w-4 h-4 animate-spin text-slate-950" />
-                <span>Varrendo PMEs com IA OpenRouter por Todo o Brasil...</span>
+                <Loader2 className="w-4 h-4 animate-spin text-white" />
+                <span>Localizando Contatos...</span>
               </>
             ) : (
               <>
-                <Sparkles className="w-4 h-4 text-slate-950 fill-slate-950" />
-                <span>🚀 Varredura Geral Brasil (OpenRouter IA + Mapas)</span>
+                <Search className="w-4 h-4" />
+                <span>Buscar Leads</span>
               </>
             )}
           </button>
         </div>
+
+        {/* Dynamic Autocomplete Dropdown */}
+        {isDropdownOpen && suggestions.length > 0 && (
+          <div className="absolute top-full left-0 right-0 mt-2 z-50 bg-slate-900 border border-slate-700 rounded-xl shadow-2xl overflow-hidden backdrop-blur-md max-h-60 overflow-y-auto">
+            {suggestions.map((loc, idx) => (
+              <button
+                key={idx}
+                onClick={() => handleSelectSuggestion(loc)}
+                className={`w-full text-left px-4 py-2.5 flex items-center justify-between text-xs transition-colors border-b border-slate-800/50 last:border-0 ${
+                  idx === selectedIndex ? 'bg-indigo-950 text-indigo-300 font-bold' : 'text-slate-200 hover:bg-slate-800'
+                }`}
+              >
+                <div className="flex items-center gap-2">
+                  <MapPin className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
+                  <span>{loc.name}</span>
+                </div>
+                <span className="text-[10px] text-slate-500 uppercase">{loc.state}</span>
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Fast Action Quick Chips for Hashtags, Profiles and Posts */}
+      <div className="flex flex-wrap items-center gap-1.5 text-xs pt-1">
+        <span className="text-[11px] text-slate-400 font-bold mr-1">Atalhos rápidos:</span>
+        {[
+          { label: '📌 #hamburgueria', val: '#hamburgueria' },
+          { label: '📌 #delivery', val: '#delivery' },
+          { label: '📌 #barbearia', val: '#barbearia' },
+          { label: '📌 #pizzaria', val: '#pizzaria' },
+          { label: '📍 Aracati - CE', val: 'Aracati' },
+          { label: '📍 Mossoró - RN', val: 'Mossoró' },
+          { label: '📍 Fortaleza - CE', val: 'Fortaleza' },
+          { label: '📍 Beberibe - CE', val: 'Beberibe' },
+          { label: '📍 Canoa Quebrada', val: 'Canoa Quebrada' },
+        ].map((chip) => (
+          <button
+            key={chip.val}
+            onClick={() => {
+              setCustomCityInput(chip.val);
+              handleSearchLeads(chip.val);
+            }}
+            className="px-2.5 py-1 rounded-md bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-300 hover:text-indigo-300 text-[11px] font-medium transition-all active:scale-95"
+          >
+            {chip.label}
+          </button>
+        ))}
       </div>
 
       {/* Add Location Modal / Popover */}

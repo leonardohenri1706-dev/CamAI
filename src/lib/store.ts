@@ -18,6 +18,27 @@ export const REAL_INITIAL_LOCATIONS: SearchLocation[] = [
     zoom: 14,
   },
   {
+    name: 'Aracati & Canoa Quebrada (Litoral Leste)',
+    city: 'Aracati',
+    state: 'CE',
+    center: { lat: -4.561700, lng: -37.769400 },
+    zoom: 14,
+  },
+  {
+    name: 'Mossoró - Nova Betânia & Centro',
+    city: 'Mossoró',
+    state: 'RN',
+    center: { lat: -5.187800, lng: -37.344200 },
+    zoom: 14,
+  },
+  {
+    name: 'Beberibe & Morro Branco (Litoral Leste)',
+    city: 'Beberibe',
+    state: 'CE',
+    center: { lat: -4.179700, lng: -38.130600 },
+    zoom: 14,
+  },
+  {
     name: 'São Paulo - Moema & Vila Olímpia',
     city: 'São Paulo',
     state: 'SP',
@@ -29,20 +50,6 @@ export const REAL_INITIAL_LOCATIONS: SearchLocation[] = [
     city: 'Rio de Janeiro',
     state: 'RJ',
     center: { lat: -22.969, lng: -43.186 },
-    zoom: 14,
-  },
-  {
-    name: 'Curitiba - Batel & Centro',
-    city: 'Curitiba',
-    state: 'PR',
-    center: { lat: -25.438, lng: -49.282 },
-    zoom: 14,
-  },
-  {
-    name: 'Belo Horizonte - Savassi & Funcionários',
-    city: 'Belo Horizonte',
-    state: 'MG',
-    center: { lat: -19.938, lng: -43.935 },
     zoom: 14,
   },
 ];

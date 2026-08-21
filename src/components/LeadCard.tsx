@@ -2,8 +2,21 @@
 
 import { PlaceLead } from '@/types/prospecting';
 import { useProspectingStore } from '@/lib/store';
-import { verifyAndFormatRealWhatsApp, buildWhatsAppLink } from '@/lib/phoneVerifier';
-import { Star, MapPin, Globe, Phone, ExternalLink, MessageCircle, Sparkles, Bookmark, Eye, AlertCircle, CheckCircle2, ShieldCheck } from 'lucide-react';
+import { buildWhatsAppLink } from '@/lib/phoneVerifier';
+import {
+  Star,
+  MapPin,
+  Globe,
+  ExternalLink,
+  MessageCircle,
+  Bookmark,
+  Eye,
+  CheckCircle2,
+  Phone,
+  Zap,
+  TrendingUp,
+  Instagram,
+} from 'lucide-react';
 import Image from 'next/image';
 
 interface LeadCardProps {
@@ -17,13 +30,10 @@ export default function LeadCard({ lead }: LeadCardProps) {
 
   // Score badge styling
   let scoreBadgeBg = 'bg-slate-800 text-slate-300 border-slate-700';
-  let scoreGlowClass = '';
   if (score >= 75) {
-    scoreBadgeBg = 'bg-emerald-500 text-slate-950 border-emerald-400 font-extrabold';
-    scoreGlowClass = 'glow-emerald';
+    scoreBadgeBg = 'bg-emerald-500 text-slate-950 border-emerald-400 font-extrabold shadow-sm';
   } else if (score >= 50) {
-    scoreBadgeBg = 'bg-amber-500 text-slate-950 border-amber-400 font-extrabold';
-    scoreGlowClass = 'glow-amber';
+    scoreBadgeBg = 'bg-amber-500 text-slate-950 border-amber-400 font-extrabold shadow-sm';
   }
 
   // Direct WhatsApp Link
@@ -33,32 +43,32 @@ export default function LeadCard({ lead }: LeadCardProps) {
   );
 
   return (
-    <div className="glass-card rounded-2xl p-4 border transition-all duration-300 hover:-translate-y-1 flex flex-col justify-between relative group">
+    <div className="glass-card rounded-2xl p-4 border border-slate-800/80 hover:border-indigo-500/40 transition-all duration-200 flex flex-col justify-between relative group">
       <div>
         {/* Thumbnail & Floating Score Badge */}
-        <div className="relative w-full h-40 rounded-xl overflow-hidden mb-3.5 bg-slate-900 border border-slate-800/80">
+        <div className="relative w-full h-40 rounded-xl overflow-hidden mb-3 bg-slate-900 border border-slate-800/80">
           {digitalHealth.photoUrl ? (
             <Image
               src={digitalHealth.photoUrl}
               alt={lead.displayName}
               fill
-              className="object-cover group-hover:scale-105 transition-transform duration-500"
+              className="object-cover group-hover:scale-105 transition-transform duration-300"
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center bg-slate-800 text-slate-500">
-              Sem Foto
+            <div className="w-full h-full flex items-center justify-center bg-slate-800 text-slate-500 text-xs">
+              Sem Imagem
             </div>
           )}
 
-          {/* Floating Score Badge */}
-          <div className={`absolute top-3 right-3 px-3 py-1 rounded-full border text-xs flex items-center gap-1.5 shadow-lg ${scoreBadgeBg} ${scoreGlowClass}`}>
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>Score: <strong>{score}%</strong></span>
+          {/* Floating Opportunity Score Badge */}
+          <div className={`absolute top-3 right-3 px-3 py-1 rounded-full border text-xs flex items-center gap-1.5 shadow-md ${scoreBadgeBg}`}>
+            <Zap className="w-3.5 h-3.5" />
+            <span>Oportunidade: <strong>{score}%</strong></span>
           </div>
 
           {/* Category Tag */}
-          <div className="absolute bottom-3 left-3 px-2.5 py-0.5 rounded-lg bg-slate-950/80 backdrop-blur-md text-[11px] font-semibold text-cyan-300 border border-slate-800">
+          <div className="absolute bottom-3 left-3 px-2.5 py-0.5 rounded-md bg-slate-950/90 backdrop-blur-md text-[11px] font-bold text-slate-200 border border-slate-800">
             {lead.category}
           </div>
 
@@ -71,7 +81,7 @@ export default function LeadCard({ lead }: LeadCardProps) {
             className={`absolute top-3 left-3 p-2 rounded-xl backdrop-blur-md border transition-all ${
               lead.isSaved
                 ? 'bg-amber-500 text-slate-950 border-amber-400'
-                : 'bg-slate-950/60 hover:bg-slate-900 text-slate-300 border-slate-700/60'
+                : 'bg-slate-950/70 hover:bg-slate-900 text-slate-300 border-slate-700/60'
             }`}
             title={lead.isSaved ? 'Remover dos salvos' : 'Salvar no CRM'}
           >
@@ -79,82 +89,90 @@ export default function LeadCard({ lead }: LeadCardProps) {
           </button>
         </div>
 
-        {/* Title & Address */}
+        {/* Business Name & Address */}
         <div className="space-y-1 mb-3">
-          <h3 className="font-bold text-base text-slate-100 line-clamp-1 group-hover:text-cyan-300 transition-colors">
+          <h3 className="font-extrabold text-base text-slate-100 line-clamp-1 group-hover:text-indigo-300 transition-colors">
             {lead.displayName}
           </h3>
           <p className="text-xs text-slate-400 flex items-center gap-1 line-clamp-1">
-            <MapPin className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+            <MapPin className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
             <span>{lead.formattedAddress}</span>
           </p>
         </div>
 
-        {/* Digital Status Badges */}
+        {/* Digital Diagnostics Badges */}
         <div className="flex flex-wrap items-center gap-1.5 mb-3 text-[11px]">
           {/* Website Status */}
           {!digitalHealth.hasWebsite ? (
-            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-950/90 text-emerald-300 border border-emerald-700/60 font-semibold shadow-sm">
-              <Globe className="w-3 h-3 text-emerald-400" /> Sem Website (+40% Opp)
+            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md bg-emerald-950/90 text-emerald-300 border border-emerald-700/60 font-bold">
+              <Globe className="w-3 h-3 text-emerald-400" /> Sem Website (+40% Potencial)
             </span>
           ) : (
-            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-slate-900 text-slate-400 border border-slate-800 font-medium">
+            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md bg-slate-900 text-slate-400 border border-slate-800 font-medium">
               <Globe className="w-3 h-3 text-slate-500" /> Website Ativo
             </span>
           )}
 
           {/* WhatsApp Badge */}
           {digitalHealth.hasWhatsApp && (
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-teal-950/80 text-teal-300 border border-teal-800/50">
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-teal-950/80 text-teal-300 border border-teal-800/50 font-medium">
               <CheckCircle2 className="w-3 h-3 text-teal-400" /> WhatsApp OK
             </span>
           )}
 
-          {/* Instagram Badge */}
+          {/* Instagram Handle & Followers */}
           {digitalHealth.hasInstagram && digitalHealth.instagramHandle && (
             <a
               href={digitalHealth.instagramProfileUrl || `https://instagram.com/${digitalHealth.instagramHandle.replace('@', '')}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-pink-950/80 text-pink-300 border border-pink-700/60 font-semibold hover:bg-pink-900/80 transition-all"
+              className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md bg-indigo-950/80 text-indigo-300 border border-indigo-800/60 font-semibold hover:bg-indigo-900/80 transition-all"
             >
-              <span>📸 {digitalHealth.instagramHandle}</span>
+              <span>{digitalHealth.instagramHandle}</span>
               {digitalHealth.instagramFollowers && (
-                <span className="text-[10px] opacity-80">({digitalHealth.instagramFollowers >= 1000 ? `${(digitalHealth.instagramFollowers / 1000).toFixed(1)}k` : digitalHealth.instagramFollowers})</span>
+                <span className="text-[10px] text-slate-400">({digitalHealth.instagramFollowers >= 1000 ? `${(digitalHealth.instagramFollowers / 1000).toFixed(1)}k` : digitalHealth.instagramFollowers})</span>
               )}
             </a>
           )}
 
-          {/* Rating Badge */}
-          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-slate-900 text-amber-300 border border-amber-950/80">
+          {/* Rating */}
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-slate-900 text-amber-300 border border-slate-800">
             <Star className="w-3 h-3 fill-amber-400 text-amber-400" /> {digitalHealth.rating} ({digitalHealth.reviewsCount})
           </span>
         </div>
 
-        {/* AI Rationale Snippet */}
-        <div className="p-2.5 rounded-xl bg-slate-900/80 border border-slate-800/80 text-xs text-slate-300 mb-4 line-clamp-2 leading-relaxed">
-          <strong className="text-cyan-400 font-semibold mr-1">IA:</strong>
+        {/* Instagram Recent Post Snippet */}
+        {digitalHealth.recentPostSnippet && (
+          <div className="p-2.5 rounded-xl bg-slate-950 border border-slate-800/80 text-xs text-slate-300 mb-2.5 line-clamp-2 leading-relaxed">
+            <span className="font-bold text-indigo-400 mr-1">Post Recente:</span>
+            "{digitalHealth.recentPostSnippet.replace(/^Post( recente)?:?\s*"?/i, '').replace(/"$/, '')}"
+          </div>
+        )}
+
+        {/* Strategic Diagnostic Rationale */}
+        <div className="p-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-300 mb-4 line-clamp-2 leading-relaxed">
+          <strong className="text-indigo-300 font-bold mr-1">Diagnóstico:</strong>
           {scoreResult.rationale}
         </div>
       </div>
 
-      {/* Quick Action Buttons */}
+      {/* Quick Actions */}
       <div className="flex items-center gap-2 pt-2 border-t border-slate-800/60">
-        {/* Lead Details & Pitch Button */}
+        {/* Details & Script Drawer */}
         <button
           onClick={() => setSelectedLead(lead)}
-          className="flex-1 py-2 px-3 rounded-xl bg-slate-800/90 hover:bg-slate-700/90 text-slate-200 text-xs font-semibold flex items-center justify-center gap-1.5 border border-slate-700/60 transition-all active:scale-95"
+          className="flex-1 py-2 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold flex items-center justify-center gap-1.5 border border-slate-700/60 transition-all active:scale-95"
         >
-          <Eye className="w-3.5 h-3.5 text-cyan-400" /> Pitch & Detalhes
+          <Eye className="w-3.5 h-3.5 text-indigo-400" /> Script & Diagnóstico
         </button>
 
-        {/* Contact Action: WhatsApp or Instagram Direct */}
+        {/* WhatsApp Button */}
         {digitalHealth.hasWhatsApp && digitalHealth.rawPhone ? (
           <a
             href={whatsappUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="py-2 px-3.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-extrabold flex items-center justify-center gap-1.5 shadow-md shadow-emerald-500/20 transition-all active:scale-95"
+            className="py-2 px-4 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-black flex items-center justify-center gap-1.5 shadow-md shadow-emerald-500/20 transition-all active:scale-95"
             title="Disparar mensagem no WhatsApp Web"
           >
             <MessageCircle className="w-4 h-4 fill-slate-950 text-slate-950" /> WhatsApp
@@ -164,43 +182,29 @@ export default function LeadCard({ lead }: LeadCardProps) {
             href={digitalHealth.instagramProfileUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="py-2 px-3.5 rounded-xl bg-gradient-to-r from-pink-600 via-purple-600 to-indigo-600 hover:from-pink-500 hover:to-indigo-500 text-white text-xs font-extrabold flex items-center justify-center gap-1.5 shadow-md shadow-pink-600/20 transition-all active:scale-95"
-            title="Abrir perfil e prospectar via Direct no Instagram"
+            className="py-2 px-3.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold flex items-center justify-center gap-1.5 shadow-md transition-all active:scale-95"
+            title="Abrir perfil no Instagram"
           >
-            📸 Direct Insta
+            Direct Insta
           </a>
         ) : (
           <a
             href={digitalHealth.googleMapsUri}
             target="_blank"
             rel="noopener noreferrer"
-            className="py-2 px-2.5 rounded-xl bg-slate-900/90 text-slate-400 text-[11px] font-medium flex items-center justify-center gap-1 border border-slate-800"
-            title="Telefone não cadastrado. Clique para ver no Google Maps"
+            className="py-2 px-2.5 rounded-xl bg-slate-900 text-slate-400 text-[11px] font-medium flex items-center justify-center gap-1 border border-slate-800"
           >
             <Phone className="w-3 h-3 text-slate-500" /> Sem Contato
           </a>
         )}
 
-        {/* Instagram Badge Link (if WhatsApp is active) */}
-        {digitalHealth.hasWhatsApp && digitalHealth.instagramProfileUrl && (
-          <a
-            href={digitalHealth.instagramProfileUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="p-2 rounded-xl bg-pink-950/60 hover:bg-pink-900/80 text-pink-300 border border-pink-800/60 transition-all"
-            title={`Abrir perfil no Instagram (${digitalHealth.instagramHandle})`}
-          >
-            📸
-          </a>
-        )}
-
-        {/* External Google Maps link */}
+        {/* Google Maps External link */}
         <a
           href={digitalHealth.googleMapsUri}
           target="_blank"
           rel="noopener noreferrer"
           className="p-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-slate-200 border border-slate-800 transition-all"
-          title="Abrir no Google Maps"
+          title="Ver no Google Maps"
         >
           <ExternalLink className="w-3.5 h-3.5" />
         </a>

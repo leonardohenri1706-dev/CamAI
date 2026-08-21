@@ -66,11 +66,16 @@ export async function POST(req: Request) {
       'Falta de canal de vendas direto e dependência de intermediários',
     ];
 
+    let suggestedHashtags = ['#hamburgueria', '#delivery', '#pizzaria', '#restaurante', '#smashburger'];
+    let prospectingPlanSummary = 'Varredura automática focada em estabelecimentos gastronômicos sem site e com forte presença no Instagram/WhatsApp no Brasil.';
+
     if (textToAnalyze.includes('barber') || textToAnalyze.includes('salao') || textToAnalyze.includes('beleza') || textToAnalyze.includes('estetica')) {
       targetBusinessTypes = ['Barbearia', 'Salão de Beleza', 'Clínica de Estética'];
       targetNiches = ['Beleza e Cuidados Pessoais'];
       coreValueProp = 'Aumente os agendamentos e zere faltas com marcação automática pelo WhatsApp 24h.';
       searchKeywords = ['barbearia premium', 'salão de beleza', 'centro de estética'];
+      suggestedHashtags = ['#barbearia', '#salaodebeleza', '#estetica', '#barbershop', '#cabeloestilo'];
+      prospectingPlanSummary = 'Varredura automática em barbearias e centros estéticos com foco em marcação de horários 24h e conversão no WhatsApp.';
       solvedPainPoints = [
         'Perda de clientes fora do horário comercial',
         'Alto índice de faltas e esquecimentos (no-show)',
@@ -81,6 +86,8 @@ export async function POST(req: Request) {
       targetNiches = ['Serviços Automotivos'];
       coreValueProp = 'Envie orçamentos ilustrados com fotos no WhatsApp e receba aprovação instantânea.';
       searchKeywords = ['oficina mecanica', 'centro automotivo', 'troca de oleo e freios'];
+      suggestedHashtags = ['#oficinamecanica', '#centroautomotivo', '#trocadeoleo', '#manutencaoauto'];
+      prospectingPlanSummary = 'Varredura em oficinas mecânicas e auto centros para envio de orçamentos rápidos e aprovação direta por WhatsApp.';
       solvedPainPoints = [
         'Demora na aprovação de orçamentos por telefone',
         'Falta de transparência e desconfiança sobre peças trocadas',
@@ -91,6 +98,8 @@ export async function POST(req: Request) {
       targetNiches = ['Saúde & Bem-estar'];
       coreValueProp = 'Secretária virtual com confirmação ativa de consultas via WhatsApp para zerar ausências.';
       searchKeywords = ['clinica odontologica', 'consultorio medico'];
+      suggestedHashtags = ['#odontologia', '#dentista', '#consultoriomedico', '#sorriso', '#saudebucal'];
+      prospectingPlanSummary = 'Varredura em clínicas odontológicas e consultórios com foco em eliminação de ausências e confirmação de consultas.';
       solvedPainPoints = [
         'Sobrecarga da recepção e telefonemas repetitivos',
         'Prejuízo com faltas em consultas agendadas',
@@ -115,6 +124,8 @@ export async function POST(req: Request) {
       coreValueProp,
       searchKeywords,
       solvedPainPoints,
+      suggestedHashtags,
+      prospectingPlanSummary,
       analyzedAt: new Date().toISOString(),
     };
 

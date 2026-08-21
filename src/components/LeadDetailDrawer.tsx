@@ -6,7 +6,6 @@ import { generateCustomPitch } from '@/lib/scoringEngine';
 import { verifyAndFormatRealWhatsApp, buildWhatsAppLink } from '@/lib/phoneVerifier';
 import {
   X,
-  Sparkles,
   Phone,
   Globe,
   Star,
@@ -16,12 +15,10 @@ import {
   Send,
   MapPin,
   TrendingUp,
-  ShieldAlert,
-  Flame,
   Bookmark,
   CheckCircle2,
-  Edit3,
   ShieldCheck,
+  Zap,
 } from 'lucide-react';
 import Image from 'next/image';
 
@@ -104,12 +101,12 @@ export default function LeadDetailDrawer() {
           {/* Header Bar */}
           <div className="sticky top-0 z-20 glass-panel px-6 py-4 border-b border-slate-800 flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <span className="p-2 rounded-xl bg-cyan-950 text-cyan-400 border border-cyan-800">
-                <Sparkles className="w-5 h-5" />
+              <span className="p-2 rounded-xl bg-indigo-950/80 text-indigo-400 border border-indigo-800/60">
+                <Zap className="w-5 h-5" />
               </span>
               <div>
-                <h2 className="font-bold text-lg text-slate-100 line-clamp-1">{selectedLead.displayName}</h2>
-                <p className="text-xs text-slate-400">Diagnóstico Digital, Verificação de WhatsApp & Script</p>
+                <h2 className="font-extrabold text-lg text-slate-100 line-clamp-1">{selectedLead.displayName}</h2>
+                <p className="text-xs text-slate-400">Diagnóstico Digital, Dados de Contato & Script de Abordagem</p>
               </div>
             </div>
 
@@ -137,7 +134,7 @@ export default function LeadDetailDrawer() {
               <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent flex items-end p-4">
                 <div className="w-full flex items-center justify-between">
                   <div>
-                    <span className="text-xs font-semibold px-2.5 py-1 rounded-md bg-slate-900/90 text-cyan-300 border border-slate-700">
+                    <span className="text-xs font-semibold px-2.5 py-1 rounded-md bg-slate-900/90 text-indigo-300 border border-slate-700">
                       {selectedLead.category}
                     </span>
                     <h3 className="font-extrabold text-xl text-white mt-1">{selectedLead.displayName}</h3>
@@ -145,16 +142,16 @@ export default function LeadDetailDrawer() {
                       href={digitalHealth.googleMapsUri}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-xs text-cyan-300 hover:text-cyan-200 flex items-center gap-1 mt-0.5 underline underline-offset-2 transition-colors"
+                      className="text-xs text-indigo-300 hover:text-indigo-200 flex items-center gap-1 mt-0.5 underline underline-offset-2 transition-colors"
                       title="Abrir no Google Maps"
                     >
-                      <MapPin className="w-3.5 h-3.5 text-cyan-400 shrink-0" /> {selectedLead.formattedAddress} (Ver no Google Maps ↗)
+                      <MapPin className="w-3.5 h-3.5 text-indigo-400 shrink-0" /> {selectedLead.formattedAddress} (Ver no Maps ↗)
                     </a>
                   </div>
 
-                  {/* Big Score Progress */}
+                  {/* Opportunity Score Progress */}
                   <div className="flex flex-col items-center justify-center p-3 rounded-2xl bg-slate-900/90 border border-slate-700 shadow-xl backdrop-blur-md">
-                    <span className="text-[10px] text-slate-400 font-semibold uppercase">Score IA</span>
+                    <span className="text-[10px] text-slate-400 font-semibold uppercase">Oportunidade</span>
                     <span className={`text-2xl font-black ${score >= 75 ? 'text-emerald-400' : 'text-amber-400'}`}>
                       {score}%
                     </span>
@@ -167,7 +164,7 @@ export default function LeadDetailDrawer() {
             </div>
 
             {/* Section 1: Phone Verification & WhatsApp Sanity */}
-            <div className="p-4 rounded-2xl bg-slate-950/90 border border-emerald-800/80 shadow-lg space-y-2.5">
+            <div className="p-4 rounded-xl bg-slate-950 border border-emerald-800/80 shadow-md space-y-2.5">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <ShieldCheck className="w-5 h-5 text-emerald-400" />
@@ -175,8 +172,8 @@ export default function LeadDetailDrawer() {
                     Número Verificado para Disparo no WhatsApp
                   </h4>
                 </div>
-                <span className="text-[10px] bg-emerald-950 text-emerald-300 px-2 py-0.5 rounded-full border border-emerald-700 font-mono">
-                  Formato +{verifiedPhone.rawPhone}
+                <span className="text-[10px] bg-emerald-950 text-emerald-300 px-2 py-0.5 rounded-md border border-emerald-700 font-mono font-bold">
+                  +{verifiedPhone.rawPhone}
                 </span>
               </div>
 
@@ -195,10 +192,65 @@ export default function LeadDetailDrawer() {
               </div>
             </div>
 
+            {/* Section 1.5: Instagram Intelligence & Recent Post Card */}
+            {digitalHealth.hasInstagram && (
+              <div className="glass-card rounded-2xl p-4 border border-slate-800 space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="p-1.5 rounded-lg bg-indigo-950 text-indigo-400 border border-indigo-800">
+                      📸
+                    </span>
+                    <div>
+                      <h4 className="font-bold text-xs text-indigo-200">
+                        Perfil & Postagens no Instagram
+                      </h4>
+                      <p className="text-[11px] text-slate-400 font-mono">
+                        {digitalHealth.instagramHandle || '@perfil'}
+                      </p>
+                    </div>
+                  </div>
+
+                  <a
+                    href={digitalHealth.instagramProfileUrl || `https://instagram.com/${digitalHealth.instagramHandle?.replace('@', '')}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-sm transition-all active:scale-95"
+                  >
+                    Abrir Perfil ↗
+                  </a>
+                </div>
+
+                {/* Bio Snippet */}
+                {digitalHealth.instagramBio && (
+                  <div className="p-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-300">
+                    <span className="font-bold text-indigo-400 block mb-0.5">Bio do Instagram:</span>
+                    {digitalHealth.instagramBio}
+                  </div>
+                )}
+
+                {/* Recent Post Snippet */}
+                {digitalHealth.recentPostSnippet && (
+                  <div className="p-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-200">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="font-bold text-indigo-300">Último Post / Publicação:</span>
+                      {digitalHealth.hashtagUsed && (
+                        <span className="text-[10px] bg-slate-900 text-indigo-300 px-2 py-0.5 rounded-md font-mono font-bold border border-slate-800">
+                          {digitalHealth.hashtagUsed}
+                        </span>
+                      )}
+                    </div>
+                    <p className="italic leading-relaxed text-slate-300">
+                      "{digitalHealth.recentPostSnippet.replace(/^Post( recente)?:?\s*"?/i, '').replace(/"$/, '')}"
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
+
             {/* Section 2: Digital Presence Diagnostics */}
-            <div className="glass-card rounded-2xl p-4 border border-slate-800/80 space-y-3">
+            <div className="glass-card rounded-2xl p-4 border border-slate-800 space-y-3">
               <h4 className="font-bold text-sm text-slate-200 flex items-center gap-2">
-                <TrendingUp className="w-4 h-4 text-cyan-400" /> Diagnóstico da Presença Digital
+                <TrendingUp className="w-4 h-4 text-indigo-400" /> Diagnóstico da Presença Digital
               </h4>
 
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -227,23 +279,23 @@ export default function LeadDetailDrawer() {
                   <span className="text-xs font-bold text-teal-300">100% Válido</span>
                 </div>
 
-                {/* Product Fit */}
+                {/* Match Factor */}
                 <div className="p-3 rounded-xl bg-slate-900/90 border border-slate-800 text-center">
-                  <Sparkles className="w-4 h-4 text-cyan-400 mx-auto mb-1" />
+                  <Zap className="w-4 h-4 text-indigo-400 mx-auto mb-1" />
                   <span className="text-[10px] text-slate-400 block font-medium">Fit ICP</span>
-                  <span className="text-xs font-bold text-cyan-300">100% Match</span>
+                  <span className="text-xs font-bold text-indigo-300">100% Match</span>
                 </div>
               </div>
 
-              {/* Rationale text box */}
-              <div className="p-3 rounded-xl bg-slate-950/80 border border-slate-800 text-xs text-slate-300 leading-relaxed">
-                <span className="font-bold text-cyan-400 mr-1">Diagnóstico:</span>
+              {/* Diagnostic Rationale */}
+              <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-300 leading-relaxed">
+                <span className="font-bold text-indigo-400 mr-1">Diagnóstico:</span>
                 {scoreResult.rationale}
               </div>
             </div>
 
             {/* Section 3: WhatsApp Sales Pitch Generator */}
-            <div className="glass-card rounded-2xl p-4 border border-slate-800/80 space-y-3">
+            <div className="glass-card rounded-2xl p-4 border border-slate-800 space-y-3">
               <div className="flex items-center justify-between">
                 <h4 className="font-bold text-sm text-slate-200 flex items-center gap-2">
                   <MessageSquare className="w-4 h-4 text-emerald-400" /> Pitch de Vendas Personalizado
@@ -254,7 +306,7 @@ export default function LeadDetailDrawer() {
                   <button
                     onClick={() => handleToneChange('consultive')}
                     className={`px-2.5 py-1 rounded-lg transition-all ${
-                      pitchTone === 'consultive' ? 'bg-cyan-950 text-cyan-300 font-bold border border-cyan-800' : 'text-slate-400 hover:text-slate-200'
+                      pitchTone === 'consultive' ? 'bg-indigo-950 text-indigo-300 font-bold border border-indigo-800' : 'text-slate-400 hover:text-slate-200'
                     }`}
                   >
                     Consultivo
@@ -262,7 +314,7 @@ export default function LeadDetailDrawer() {
                   <button
                     onClick={() => handleToneChange('direct')}
                     className={`px-2.5 py-1 rounded-lg transition-all ${
-                      pitchTone === 'direct' ? 'bg-cyan-950 text-cyan-300 font-bold border border-cyan-800' : 'text-slate-400 hover:text-slate-200'
+                      pitchTone === 'direct' ? 'bg-indigo-950 text-indigo-300 font-bold border border-indigo-800' : 'text-slate-400 hover:text-slate-200'
                     }`}
                   >
                     Direto
@@ -270,7 +322,7 @@ export default function LeadDetailDrawer() {
                   <button
                     onClick={() => handleToneChange('promotional')}
                     className={`px-2.5 py-1 rounded-lg transition-all ${
-                      pitchTone === 'promotional' ? 'bg-cyan-950 text-cyan-300 font-bold border border-cyan-800' : 'text-slate-400 hover:text-slate-200'
+                      pitchTone === 'promotional' ? 'bg-indigo-950 text-indigo-300 font-bold border border-indigo-800' : 'text-slate-400 hover:text-slate-200'
                     }`}
                   >
                     Promocional
@@ -284,14 +336,14 @@ export default function LeadDetailDrawer() {
                   value={scoreResult.customPitch}
                   onChange={(e) => updateLeadPitch(selectedLead.id, e.target.value)}
                   rows={8}
-                  className="w-full p-3.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-200 leading-relaxed font-sans focus:outline-none focus:border-cyan-500 transition-all"
+                  className="w-full p-3.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-200 leading-relaxed font-sans focus:outline-none focus:border-indigo-500 transition-all"
                 />
                 <span className="absolute bottom-3 right-3 text-[10px] text-slate-500">Editável em tempo real</span>
               </div>
             </div>
 
             {/* Section 4: CRM Pipeline Status */}
-            <div className="glass-card rounded-2xl p-4 border border-slate-800/80 space-y-2">
+            <div className="glass-card rounded-2xl p-4 border border-slate-800 space-y-2">
               <div className="flex items-center justify-between">
                 <h4 className="font-bold text-xs text-slate-300 flex items-center gap-1.5">
                   <Bookmark className="w-4 h-4 text-amber-400" /> Status no Pipeline CRM:
@@ -306,7 +358,7 @@ export default function LeadDetailDrawer() {
                       }}
                       className={`text-xs px-2.5 py-1 rounded-lg border transition-all ${
                         selectedLead.crmStatus === status
-                          ? 'bg-cyan-950 text-cyan-300 border-cyan-600 font-bold'
+                          ? 'bg-indigo-950 text-indigo-300 border-indigo-600 font-bold'
                           : 'bg-slate-900 text-slate-400 border-slate-800 hover:text-slate-200'
                       }`}
                     >
@@ -324,16 +376,16 @@ export default function LeadDetailDrawer() {
               onClick={handleCopyPitch}
               className="py-3 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold flex items-center gap-2 border border-slate-700 transition-all active:scale-95"
             >
-              {copied ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4 text-cyan-400" />}
+              {copied ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4 text-indigo-400" />}
               <span>{copied ? 'Copiado!' : 'Copiar Pitch'}</span>
             </button>
 
             <button
               onClick={handleOpenWhatsApp}
               disabled={!verifiedPhone.hasWhatsApp || !verifiedPhone.rawPhone}
-              className="flex-1 py-3 px-4 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-extrabold text-sm flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/25 active:scale-95 transition-all disabled:opacity-40 disabled:cursor-not-allowed disabled:from-slate-800 disabled:to-slate-800 disabled:text-slate-500 disabled:shadow-none"
+              className="flex-1 py-3 px-4 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-sm flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20 active:scale-95 transition-all disabled:opacity-40 disabled:cursor-not-allowed disabled:bg-slate-800 disabled:text-slate-500"
             >
-              <Send className="w-4 h-4" /> {verifiedPhone.hasWhatsApp && verifiedPhone.rawPhone ? `Abrir WhatsApp Web (${verifiedPhone.formattedPhone})` : 'Telefone Não Cadastrado'}
+              <Send className="w-4 h-4" /> {verifiedPhone.hasWhatsApp && verifiedPhone.rawPhone ? `Disparar no WhatsApp (${verifiedPhone.formattedPhone})` : 'Telefone Não Cadastrado'}
             </button>
           </div>
         </div>
