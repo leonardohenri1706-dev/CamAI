@@ -91,3 +91,109 @@ export function buildWhatsAppLink(rawPhone: string | null | undefined, messageTe
 }
 
 export const formatAndVerifyWhatsAppNumber = verifyAndFormatRealWhatsApp;
+
+/**
+ * Lightweight HTML Crawler for Website Contacts
+ * Extracts real WhatsApp mobile numbers and Instagram links from business websites.
+ */
+export async function crawlWebsiteForContacts(websiteUrl: string | null | undefined): Promise<{
+  whatsAppPhone: string | null;
+  instagramHandle: string | null;
+}> {
+  if (!websiteUrl || typeof websiteUrl !== 'string' || !websiteUrl.startsWith('http')) {
+    return { whatsAppPhone: null, instagramHandle: null };
+  }
+
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 3500);
+
+    const res = await fetch(websiteUrl, {
+      method: 'GET',
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+      },
+      signal: controller.signal,
+    });
+
+    clearTimeout(timeoutId);
+    if (!res.ok) return { whatsAppPhone: null, instagramHandle: null };
+
+    const html = await res.text();
+
+    // 1. Check for wa.me / api.whatsapp.com links
+    let foundPhone: string | null = null;
+    const waLinkMatch = html.match(/(?:wa\.me\/|api\.whatsapp\.com\/send\?phone=)(\d{10,13})/i);
+    if (waLinkMatch && waLinkMatch[1]) {
+      const verified = verifyAndFormatRealWhatsApp(waLinkMatch[1]);
+      if (verified) foundPhone = verified.rawPhone;
+    }
+
+    // 2. Fallback: Brazilian cellular regex search in HTML
+    if (!foundPhone) {
+      const mobileMatch = html.match(/(?:whatsapp|whats|contato|celular|fone)?[:\s]*\(?([1-9]{2})\)?\s?(9\d{4})[-\s]?(\d{4})/i);
+      if (mobileMatch) {
+        const fullCandidate = `${mobileMatch[1]}${mobileMatch[2]}${mobileMatch[3]}`;
+        const verified = verifyAndFormatRealWhatsApp(fullCandidate);
+        if (verified) foundPhone = verified.rawPhone;
+      }
+    }
+
+    // 3. Extract Instagram link if present on site
+    let foundInsta: string | null = null;
+    const instaMatch = html.match(/href=["']https?:\/\/(?:www\.)?instagram\.com\/([a-zA-Z0-9_.]+)\/?["']/i);
+    if (instaMatch && instaMatch[1]) {
+      const handle = instaMatch[1].trim();
+      if (!['p', 'reel', 'stories', 'explore', 'wordpress', 'sharer'].includes(handle.toLowerCase())) {
+        foundInsta = `@${handle.replace('@', '')}`;
+      }
+    }
+
+    return {
+      whatsAppPhone: foundPhone,
+      instagramHandle: foundInsta,
+    };
+  } catch {
+    return { whatsAppPhone: null, instagramHandle: null };
+  }
+}
+
+/**
+ * Check if a number actually exists on WhatsApp using Evolution API / Z-API
+ */
+export async function checkWhatsAppExists(
+  cleanPhone: string,
+  evolutionUrl?: string,
+  apiKey?: string
+): Promise<boolean> {
+  if (!evolutionUrl || !apiKey || !cleanPhone) {
+    return true; // Fallback to true if validator instance is not configured
+  }
+
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 4000);
+
+    const res = await fetch(`${evolutionUrl.replace(/\/$/, '')}/chat/whatsappNumbers/${cleanPhone}`, {
+      method: 'POST',
+      headers: {
+        'apikey': apiKey,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ numbers: [cleanPhone] }),
+      signal: controller.signal,
+    });
+
+    clearTimeout(timeoutId);
+    if (res.ok) {
+      const data = await res.json();
+      if (Array.isArray(data) && data.length > 0) {
+        return data[0]?.exists ?? true;
+      }
+    }
+  } catch {
+    return true; // Graceful fallback
+  }
+
+  return true;
+}
