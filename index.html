@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="refresh" content="0;url=http://localhost:3000">
+  <title>BotClientes - Live Preview Redirection</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: #020617;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    }
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+  </style>
+  <script>
+    // If opened directly in browser, redirect immediately to Next.js port 3000
+    if (window.top === window.self) {
+      window.location.replace("http://localhost:3000");
+    }
+  </script>
+</head>
+<body>
+  <iframe src="http://localhost:3000" title="BotClientes App"></iframe>
+</body>
+</html>
