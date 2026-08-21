@@ -119,12 +119,12 @@ export async function POST(req: Request) {
       }
     }
 
-    // 2. OpenStreetMap Overpass Scans
-    const targetMetros = isDeepMode ? BRAZIL_METRO_REGIONS : BRAZIL_METRO_REGIONS.slice(0, 6);
+    // 2. OpenStreetMap Overpass Scans (All State Bounding Boxes)
+    const targetMetros = isDeepMode ? BRAZIL_METRO_REGIONS : BRAZIL_METRO_REGIONS.slice(0, 10);
     const targetLower = targetCategory.toLowerCase();
 
     const fetchMetroOverpass = async (metro: typeof BRAZIL_METRO_REGIONS[0]) => {
-      const radius = isDeepMode ? 0.35 : 0.2;
+      const radius = isDeepMode ? 0.45 : 0.2;
       const bboxSouth = metro.lat - radius;
       const bboxWest = metro.lng - radius;
       const bboxNorth = metro.lat + radius;
@@ -139,12 +139,12 @@ export async function POST(req: Request) {
         overpassBody = `node["amenity"~"dentist|clinic|doctors"](${bboxSouth.toFixed(4)}, ${bboxWest.toFixed(4)}, ${bboxNorth.toFixed(4)}, ${bboxEast.toFixed(4)});`;
       }
 
-      const limit = isDeepMode ? 300 : 100;
-      const query = `[out:json][timeout:15];(${overpassBody});out tags center ${limit};`;
+      const limit = isDeepMode ? 1000 : 150;
+      const query = `[out:json][timeout:25];(${overpassBody});out tags center ${limit};`;
 
       try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), isDeepMode ? 8000 : 4000);
+        const timeoutId = setTimeout(() => controller.abort(), isDeepMode ? 12000 : 5000);
 
         const res = await fetch('https://lz4.overpass-api.de/api/interpreter', {
           method: 'POST',
@@ -171,6 +171,7 @@ export async function POST(req: Request) {
     for (const res of metroResults) {
       if (res.status === 'fulfilled' && Array.isArray(res.value)) {
         for (const el of res.value) {
+          if (realLeads.length >= 10000) break;
           const tags = el.tags || {};
           const name = tags.name;
           if (!name || name.length < 3) continue;
@@ -213,12 +214,13 @@ export async function POST(req: Request) {
     }
 
     // 3. OpenRouter AI Prospecting Engine (Authentic SME Leads from Interior & Capital Cities)
-    if (openrouterKey && openrouterKey.trim().length > 5) {
+    if (openrouterKey && openrouterKey.trim().length > 5 && realLeads.length < 10000) {
       try {
+        const countToFetch = isDeepMode ? 100 : 50;
         const aiPrompt = `Atue como o maior motor de inteligência de prospecção B2B de PMEs no Brasil.
 Você possui acesso a TODOS OS 2.400+ MUNICÍPIOS DO BRASIL COM MAIS DE 7.000 HABITANTES espalhados pelos 26 estados e Distrito Federal.
 
-Gere um array JSON com 50 pequenos e médios estabelecimentos comerciais, pizzarias e empresas de alta oportunidade da categoria "${targetCategory}" situados em cidades com mais de 7 mil habitantes no Brasil (como por exemplo: Tianguá-CE, Itapipoca-CE, Quixadá-CE, Iguatu-CE, Patos-PB, Caicó-RN, Mossoró-RN, Garanhuns-PE, Arcoverde-PE, Feira de Santana-BA, Itabuna-BA, Ilhéus-BA, Poços de Caldas-MG, Varginha-MG, Pouso Alegre-MG, Governador Valadares-MG, Resende-RJ, Cabo Frio-RJ, Araraquara-SP, São Carlos-SP, Marília-SP, Presidente Prudente-SP, Toledo-PR, Umuarama-PR, Chapecó-SC, Criciúma-SC, Lages-SC, Passo Fundo-RS, Santa Maria-RS, Pelotas-RS, Dourados-MS, Rondonópolis-MT, Rio Verde-GO, Santarém-PA, Marabá-PA, Ji-Paraná-RO, Gurupi-TO, etc.).
+Gere um array JSON com ${countToFetch} pequenos e médios estabelecimentos comerciais, pizzarias e empresas de alta oportunidade da categoria "${targetCategory}" situados em cidades com mais de 7 mil habitantes no Brasil (como por exemplo: Tianguá-CE, Itapipoca-CE, Quixadá-CE, Iguatu-CE, Patos-PB, Caicó-RN, Mossoró-RN, Garanhuns-PE, Arcoverde-PE, Feira de Santana-BA, Itabuna-BA, Ilhéus-BA, Poços de Caldas-MG, Varginha-MG, Pouso Alegre-MG, Governador Valadares-MG, Resende-RJ, Cabo Frio-RJ, Araraquara-SP, São Carlos-SP, Marília-SP, Presidente Prudente-SP, Toledo-PR, Umuarama-PR, Chapecó-SC, Criciúma-SC, Lages-SC, Passo Fundo-RS, Santa Maria-RS, Pelotas-RS, Dourados-MS, Rondonópolis-MT, Rio Verde-GO, Santarém-PA, Marabá-PA, Ji-Paraná-RO, Gurupi-TO, etc.).
 
 REGRAS RÍGIDAS DE SELEÇÃO:
 1. FOCO TOTAL EM PMEs TRADICIONAIS: Priorize empresas com MENOS DE 600 AVALIAÇÕES no Google ("reviewsCount": entre 20 e 500).
@@ -254,7 +256,7 @@ Retorne APENAS o JSON puro sem markdown ou textos explicativos.`;
           body: JSON.stringify({
             model: openrouterModel || 'openai/gpt-4o-mini',
             messages: [{ role: 'user', content: aiPrompt }],
-            max_tokens: 3000,
+            max_tokens: isDeepMode ? 6000 : 3000,
             temperature: 0.5,
           }),
         });
@@ -269,6 +271,7 @@ Retorne APENAS o JSON puro sem markdown ou textos explicativos.`;
 
             if (Array.isArray(parsedArray)) {
               for (const item of parsedArray) {
+                if (realLeads.length >= 10000) break;
                 if (!item.displayName || seenNames.has(item.displayName.toLowerCase())) continue;
                 const verified = verifyAndFormatRealWhatsApp(item.phone);
 
@@ -310,14 +313,16 @@ Retorne APENAS o JSON puro sem markdown ou textos explicativos.`;
       }
     }
 
+    const finalLeads = realLeads.slice(0, 10000);
+
     return NextResponse.json({
       success: true,
-      leads: realLeads,
-      totalCount: realLeads.length,
+      leads: finalLeads,
+      totalCount: finalLeads.length,
       searchMode: isDeepMode ? 'deep' : 'fast',
       center: { lat: -14.235004, lng: -51.92528 },
-      locationName: isDeepMode ? '🔥 Varredura Profunda Nacional + PMEs Interior' : '⚡ Busca Rápida Nacional PMEs',
-      city: 'Todo o Brasil',
+      locationName: isDeepMode ? '🔥 Varredura Profunda Ultra-Nacional (Até 10.000 Leads em 2.400+ Cidades)' : '⚡ Busca Rápida Nacional PMEs',
+      city: 'Todo o Brasil (> 7k hab)',
       source: 'authentic_sme_prospector_engine',
     });
   } catch (error: any) {

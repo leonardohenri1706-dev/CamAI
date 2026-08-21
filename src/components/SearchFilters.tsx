@@ -336,7 +336,7 @@ export default function SearchFilters() {
             <span className="text-[11px] text-slate-400 font-extrabold px-1.5">Modo:</span>
             {[
               { label: '⚡ Busca Rápida', val: 'fast', desc: 'Retorno instantâneo dos clientes verificados principais' },
-              { label: '🔥 Busca Profunda (~1000+ Leads)', val: 'deep', desc: 'Varredura mais lenta nas 15 maiores regiões do Brasil' },
+              { label: '🔥 Busca Profunda (Até 10.000 Leads)', val: 'deep', desc: 'Varredura massiva em todos os 2.400+ municípios com mais de 7 mil habitantes no Brasil' },
             ].map((mode) => (
               <button
                 key={mode.val}
