@@ -137,6 +137,7 @@ export const useProspectingStore = create<ProspectingState>((set, get) => ({
   pitchTone: 'consultive',
   apiSettings: {
     useMockEngine: false,
+    openrouterApiKey: process.env.NEXT_PUBLIC_OPENROUTER_API_KEY || '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',
     openrouterModel: 'openai/gpt-4o-mini',
     devName: 'Leonardo',
     demoUrl: 'https://pizzaria-arteedelicia.vercel.app/',
