@@ -8,7 +8,9 @@ from .views import (
     LeadListCreateView,
     LeadDetailView,
     LocationAutocompleteView,
-    CRMStatsView
+    CRMStatsView,
+    StartEnrichmentView,
+    TaskStatusView
 )
 
 urlpatterns = [
@@ -19,6 +21,9 @@ urlpatterns = [
     path('locations/', LocationListCreateView.as_view(), name='locations'),
     path('locations/<int:pk>/', LocationDeleteView.as_view(), name='location-detail'),
     path('crm/stats/', CRMStatsView.as_view(), name='crm-stats'),
+    path('leads/enrich/', StartEnrichmentView.as_view(), name='start-enrichment'),
+    path('leads/task/<str:task_id>/', TaskStatusView.as_view(), name='task-status'),
     path('leads/', LeadListCreateView.as_view(), name='leads'),
     path('leads/<str:lead_id>/', LeadDetailView.as_view(), name='lead-detail'),
 ]
+

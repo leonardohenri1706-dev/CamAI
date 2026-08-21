@@ -413,3 +413,87 @@ class LocationAutocompleteView(APIView):
             print(f"Autocomplete error: {e}")
 
         return Response({'success': True, 'suggestions': suggestions[:8]})
+
+
+class StartEnrichmentView(APIView):
+    """
+    POST /api/django/leads/enrich/
+    Dispatches Celery background enrichment task or runs synchronous fallback.
+    """
+    def post(self, request):
+        raw_leads = request.data.get("leads", [])
+        if not raw_leads:
+            return Response({"error": "Nenhum lead fornecido."}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            from .tasks import process_leads_task
+            task = process_leads_task.delay(raw_leads)
+            return Response({
+                "task_id": task.id,
+                "status": "QUEUED"
+            }, status=status.HTTP_202_ACCEPTED)
+        except Exception as e:
+            # Fallback if Celery/Redis worker is offline: execute directly
+            import asyncio
+            from .engine.batch_crawler import enrich_leads_batch
+            from .engine.phone_verifier import verify_and_format_real_whatsapp
+
+            enriched = asyncio.run(enrich_leads_batch(raw_leads, max_concurrency=15, timeout_sec=3.5))
+            final_leads = []
+            for lead in enriched:
+                target_phone = lead.get("whatsapp_number") or lead.get("phone_raw") or lead.get("rawPhone")
+                valid_phone_data = verify_and_format_real_whatsapp(target_phone)
+                if valid_phone_data:
+                    lead["is_valid_cellphone"] = True
+                    lead["clean_phone"] = valid_phone_data.get("rawPhone")
+                    lead["formatted_phone"] = valid_phone_data.get("formattedPhone")
+                    lead["whatsapp_url"] = valid_phone_data.get("waUrl")
+                else:
+                    lead["is_valid_cellphone"] = False
+                final_leads.append(lead)
+
+            return Response({
+                "task_id": "direct_sync_fallback",
+                "status": "SUCCESS",
+                "result": {"leads": final_leads, "total_processed": len(final_leads)}
+            }, status=status.HTTP_200_OK)
+
+
+class TaskStatusView(APIView):
+    """
+    GET /api/django/leads/task/<task_id>/
+    Polls status and results of Celery asynchronous task.
+    """
+    def get(self, request, task_id):
+        if task_id == "direct_sync_fallback":
+            return Response({'state': 'SUCCESS', 'result': {'leads': [], 'total_processed': 0}})
+
+        try:
+            from celery.result import AsyncResult
+            result = AsyncResult(task_id)
+
+            if result.state == 'PENDING':
+                response = {'state': result.state, 'status': 'Aguardando na fila do Celery...'}
+            elif result.state == 'PROGRESS':
+                response = {
+                    'state': result.state,
+                    'current': result.info.get('current', 0) if isinstance(result.info, dict) else 0,
+                    'total': result.info.get('total', 1) if isinstance(result.info, dict) else 1,
+                    'status': result.info.get('status', 'Processando sites...') if isinstance(result.info, dict) else 'Processando...'
+                }
+            elif result.state == 'SUCCESS':
+                response = {
+                    'state': result.state,
+                    'result': result.result
+                }
+            elif result.state == 'FAILURE':
+                response = {
+                    'state': result.state,
+                    'error': str(result.info)
+                }
+            else:
+                response = {'state': result.state}
+
+            return Response(response)
+        except Exception as e:
+            return Response({'state': 'FAILURE', 'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
