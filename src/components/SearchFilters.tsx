@@ -486,17 +486,18 @@ export default function SearchFilters() {
             <span>Zap Verificado</span>
           </div>
 
-          {/* Quick Filter: No Website */}
+          {/* Quick Filter: No Website + Has Instagram (Gold Opportunities) */}
           <button
-            onClick={() => setFilters({ onlyNoWebsite: !filters.onlyNoWebsite })}
+            onClick={() => setFilters({ onlyNoWebsite: !filters.onlyNoWebsite, sourceFilter: 'all' })}
             className={`px-3 py-1.5 rounded-xl border transition-all flex items-center gap-1.5 ${
               filters.onlyNoWebsite
-                ? 'bg-emerald-950/80 text-emerald-300 border-emerald-600 font-semibold shadow-sm'
-                : 'bg-slate-900/80 text-slate-400 border-slate-800 hover:text-slate-200'
+                ? 'bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 text-slate-950 border-emerald-400 font-black shadow-lg ring-1 ring-emerald-400'
+                : 'bg-slate-900/80 text-slate-300 border-slate-800 hover:text-white'
             }`}
+            title="Filtrar pequenas empresas e pizzarias no interior sem site mas com Instagram ativo"
           >
             <Globe className="w-3.5 h-3.5 text-emerald-400" />
-            <span>Apenas Sem Website (+40% Opp)</span>
+            <span>🍕 Interior + Insta sem Site (Oportunidade Ouro)</span>
           </button>
 
           {/* Quick Filter: Score > 70% */}

@@ -176,23 +176,28 @@ export async function POST(req: Request) {
       }
     }
 
-    // 3. OpenRouter AI Massive Lead Generation Engine
+    // 3. OpenRouter AI Prospecting Engine (Targeting Interior Towns & Small Businesses with Instagram & No Website)
     if (openrouterKey && openrouterKey.trim().length > 5) {
       try {
-        const aiPrompt = `Você é um motor de inteligência de prospecção B2B de altíssima escala no Brasil.
-Gere um array JSON massivo com 50 estabelecimentos comerciais reais e de altíssimo potencial da categoria "${targetCategory}" espalhados por todo o Brasil (São Paulo, Rio de Janeiro, Curitiba, Belo Horizonte, Porto Alegre, Brasília, Salvador, Recife, Fortaleza, Campinas, Santos, Goiânia, Manaus, Belém, Florianópolis).
+        const aiPrompt = `Atue como um motor de inteligência de mercado B2B focado em prospecção de alta conversão no Brasil.
+Gere um array JSON com 50 pequenos estabelecimentos comerciais e pizzarias de altíssimo potencial da categoria "${targetCategory}" situados PRINCIPALMENTE em cidades do INTERIOR do Brasil (fora das grandes capitais, como por exemplo: Sobral-CE, Juazeiro do Norte-CE, Sorocaba-SP, Ribeirão Preto-SP, Feira de Santana-BA, Caruaru-PE, Uberlândia-MG, Londrina-PR, Caxias do Sul-RS, Volta Redonda-RJ, Franca-SP, Bauru-SP, Petrolina-PE).
+
+REGRAS DE OURO PARA ESTES CLIENTES:
+1. A maioria NÃO POSSUI WEBSITE ATIVO ("hasWebsite": false).
+2. A maioria POSSUI INSTAGRAM ATIVO ("instagramHandle": "@perfil_instagram_real").
+3. Possuem atendimento e vendas ativas no WhatsApp.
 
 Siga ESTRITAMENTE este formato JSON por item:
 [
   {
     "displayName": "Nome do Estabelecimento",
     "category": "${targetCategory}",
-    "city": "Nome da Cidade",
+    "city": "Nome da Cidade do Interior",
     "formattedAddress": "Rua/Avenida, Número - Bairro, Cidade - UF",
     "neighborhood": "Nome do Bairro",
-    "phone": "11991234455",
+    "phone": "88991234455",
     "rating": 4.8,
-    "reviewsCount": 230,
+    "reviewsCount": 210,
     "hasWebsite": false,
     "instagramHandle": "@perfil_instagram"
   }
