@@ -44,7 +44,6 @@ CATEGORY_PHOTO_PRESETS = {
 }
 
 CITY_COORDINATES_MAP = {
-    'fortaleza': {'lat': -3.731862, 'lng': -38.526670, 'name': 'Fortaleza', 'state': 'CE'},
     'são paulo': {'lat': -23.550520, 'lng': -46.633308, 'name': 'São Paulo', 'state': 'SP'},
     'sao paulo': {'lat': -23.550520, 'lng': -46.633308, 'name': 'São Paulo', 'state': 'SP'},
     'rio de janeiro': {'lat': -22.906847, 'lng': -43.172896, 'name': 'Rio de Janeiro', 'state': 'RJ'},
@@ -53,6 +52,18 @@ CITY_COORDINATES_MAP = {
     'salvador': {'lat': -12.977749, 'lng': -38.501630, 'name': 'Salvador', 'state': 'BA'},
     'recife': {'lat': -8.047562, 'lng': -34.876964, 'name': 'Recife', 'state': 'PE'},
     'brasília': {'lat': -15.797515, 'lng': -47.891887, 'name': 'Brasília', 'state': 'DF'},
+    'brasilia': {'lat': -15.797515, 'lng': -47.891887, 'name': 'Brasília', 'state': 'DF'},
+    'fortaleza': {'lat': -3.731862, 'lng': -38.526670, 'name': 'Fortaleza', 'state': 'CE'},
+    'porto alegre': {'lat': -30.034647, 'lng': -51.217658, 'name': 'Porto Alegre', 'state': 'RS'},
+    'campinas': {'lat': -22.909938, 'lng': -47.062633, 'name': 'Campinas', 'state': 'SP'},
+    'florianópolis': {'lat': -27.595378, 'lng': -48.548050, 'name': 'Florianópolis', 'state': 'SC'},
+    'florianopolis': {'lat': -27.595378, 'lng': -48.548050, 'name': 'Florianópolis', 'state': 'SC'},
+    'santos': {'lat': -23.960833, 'lng': -46.333889, 'name': 'Santos', 'state': 'SP'},
+    'goiânia': {'lat': -16.686891, 'lng': -49.264794, 'name': 'Goiânia', 'state': 'GO'},
+    'goiania': {'lat': -16.686891, 'lng': -49.264794, 'name': 'Goiânia', 'state': 'GO'},
+    'manaus': {'lat': -3.119028, 'lng': -60.021731, 'name': 'Manaus', 'state': 'AM'},
+    'belém': {'lat': -1.455755, 'lng': -48.490180, 'name': 'Belém', 'state': 'PA'},
+    'belem': {'lat': -1.455755, 'lng': -48.490180, 'name': 'Belém', 'state': 'PA'},
 }
 
 def geocode_location_with_osm(query: str) -> Dict[str, Any]:
@@ -78,10 +89,10 @@ def geocode_location_with_osm(query: str) -> Dict[str, Any]:
             }
     return {
         'success': True,
-        'name': query or 'Fortaleza - Meireles',
-        'city': 'Fortaleza',
-        'state': 'CE',
-        'center': {'lat': -3.731862, 'lng': -38.526670},
+        'name': query or 'São Paulo - Centro',
+        'city': 'São Paulo',
+        'state': 'SP',
+        'center': {'lat': -23.550520, 'lng': -46.633308},
         'zoom': 14
     }
 
@@ -181,17 +192,15 @@ def search_real_places_with_python(
         overpass_body = f'node["amenity"~"restaurant|fast_food|cafe|bar"]({bbox_south:.4f}, {bbox_west:.4f}, {bbox_north:.4f}, {bbox_east:.4f});'
 
     overpass_query = f"""
-    [out:json][timeout:8];
+    [out:json][timeout:10];
     (
       {overpass_body}
     );
-    out tags center 50;
+    out tags center 500;
     """
 
-    # If we already have verified leads from the verified catalog, only query Overpass if needed
-    if len(real_leads) < 15:
-        for ep in ["https://lz4.overpass-api.de/api/interpreter", "https://overpass-api.de/api/interpreter"]:
-            try:
+    for ep in ["https://lz4.overpass-api.de/api/interpreter", "https://overpass-api.de/api/interpreter"]:
+        try:
                 res = requests.post(
                     ep,
                     data={"data": overpass_query},

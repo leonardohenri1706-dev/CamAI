@@ -32,52 +32,75 @@ export default function Home() {
   useEffect(() => {
     fetchCrmData();
     if (leads.length === 0) {
-      fetch('http://127.0.0.1:8000/api/django/search-places/', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          location: currentLocation,
-          category: 'Hamburgueria',
-        }),
-      })
-        .then((r) => r.json())
-        .then(async (searchData) => {
-          if (searchData.success && Array.isArray(searchData.leads)) {
-            try {
-              const scoreRes = await fetch('http://127.0.0.1:8000/api/django/score-lead/', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  rawLeads: searchData.leads,
-                  repoAnalysis: currentRepo,
-                  pitchTone: pitchTone,
-                  devName: apiSettings.devName || 'Leonardo',
-                  demoUrl: apiSettings.demoUrl,
-                }),
-              });
-              const scoreData = await scoreRes.json();
-              if (scoreData.success && Array.isArray(scoreData.leads)) {
-                setLeads(scoreData.leads);
-              }
-            } catch {
-              // fallback client score
-              const scored = searchData.leads.map((l: any) => ({
-                ...l,
-                scoreResult: calculateLeadScore(
-                  l.displayName,
-                  l.category,
-                  l.digitalHealth,
-                  currentRepo,
-                  pitchTone,
-                  apiSettings.devName || 'Leonardo',
-                  apiSettings.demoUrl
-                ),
-              }));
-              setLeads(scored);
-            }
+      const fetchInitialLeads = async () => {
+        let searchData: any = null;
+        try {
+          const res = await fetch('http://127.0.0.1:8000/api/django/search-places/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ location: currentLocation, category: 'Hamburgueria' }),
+          });
+          searchData = await res.json();
+        } catch {
+          const res = await fetch('/api/search-places', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ location: currentLocation, category: 'Hamburgueria' }),
+          });
+          searchData = await res.json();
+        }
+
+        if (searchData && searchData.success && Array.isArray(searchData.leads)) {
+          let scoreData: any = null;
+          try {
+            const scoreRes = await fetch('http://127.0.0.1:8000/api/django/score-lead/', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                rawLeads: searchData.leads,
+                repoAnalysis: currentRepo,
+                pitchTone: pitchTone,
+                devName: apiSettings.devName || 'Leonardo',
+                demoUrl: apiSettings.demoUrl,
+              }),
+            });
+            scoreData = await scoreRes.json();
+          } catch {
+            const scoreRes = await fetch('/api/score-lead', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                rawLeads: searchData.leads,
+                repoAnalysis: currentRepo,
+                pitchTone: pitchTone,
+                devName: apiSettings.devName || 'Leonardo',
+                demoUrl: apiSettings.demoUrl,
+              }),
+            });
+            scoreData = await scoreRes.json();
           }
-        })
-        .catch(() => {});
+
+          if (scoreData && scoreData.success && Array.isArray(scoreData.leads)) {
+            setLeads(scoreData.leads);
+          } else {
+            const scored = searchData.leads.map((l: any) => ({
+              ...l,
+              scoreResult: calculateLeadScore(
+                l.displayName,
+                l.category,
+                l.digitalHealth,
+                currentRepo,
+                pitchTone,
+                apiSettings.devName || 'Leonardo',
+                apiSettings.demoUrl
+              ),
+            }));
+            setLeads(scored);
+          }
+        }
+      };
+
+      fetchInitialLeads();
     }
   }, [fetchCrmData, leads.length, currentLocation, currentRepo, pitchTone, apiSettings, setLeads]);
 
