@@ -115,6 +115,18 @@ export default function Home() {
       return true;
     })
     .sort((a, b) => {
+      // 1. Recommend Traditional SMBs (< 600 reviews & no website) FIRST
+      const aIsTraditionalSme = a.digitalHealth.reviewsCount < 600 && !a.digitalHealth.hasWebsite;
+      const bIsTraditionalSme = b.digitalHealth.reviewsCount < 600 && !b.digitalHealth.hasWebsite;
+      if (aIsTraditionalSme && !bIsTraditionalSme) return -1;
+      if (!aIsTraditionalSme && bIsTraditionalSme) return 1;
+
+      // 2. Prioritize businesses under 600 reviews over giant chains
+      const aUnder600 = a.digitalHealth.reviewsCount < 600;
+      const bUnder600 = b.digitalHealth.reviewsCount < 600;
+      if (aUnder600 && !bUnder600) return -1;
+      if (!aUnder600 && bUnder600) return 1;
+
       if (filters.sortBy === 'reviews') {
         return b.digitalHealth.reviewsCount - a.digitalHealth.reviewsCount;
       }

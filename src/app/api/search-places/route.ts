@@ -3,26 +3,59 @@ import { PlaceLead } from '@/types/prospecting';
 import { verifyAndFormatRealWhatsApp } from '@/lib/phoneVerifier';
 import { VERIFIED_PLACES_DATABASE } from '@/lib/placesDatabase';
 
-// Major & Interior Brazilian Metro Regions for Deep Scan
+// Comprehensive National & Regional City Bounding Boxes (Capitals & Interior Towns Across All 5 Regions)
 const BRAZIL_METRO_REGIONS = [
+  // Southeast
   { city: 'São Paulo', state: 'SP', lat: -23.550520, lng: -46.633308 },
-  { city: 'Rio de Janeiro', state: 'RJ', lat: -22.906847, lng: -43.172896 },
-  { city: 'Sobral', state: 'CE', lat: -3.6883, lng: -40.3497 },
-  { city: 'Juazeiro do Norte', state: 'CE', lat: -7.2289, lng: -39.3142 },
+  { city: 'Campinas', state: 'SP', lat: -22.909938, lng: -47.062633 },
   { city: 'Sorocaba', state: 'SP', lat: -23.5262, lng: -47.4645 },
   { city: 'Ribeirão Preto', state: 'SP', lat: -21.1895, lng: -47.8105 },
-  { city: 'Curitiba', state: 'PR', lat: -25.428954, lng: -49.267137 },
+  { city: 'Santos', state: 'SP', lat: -23.960833, lng: -46.333889 },
+  { city: 'Bauru', state: 'SP', lat: -22.3147, lng: -49.0606 },
+  { city: 'São José dos Campos', state: 'SP', lat: -23.2237, lng: -45.9009 },
+  { city: 'Rio de Janeiro', state: 'RJ', lat: -22.906847, lng: -43.172896 },
+  { city: 'Volta Redonda', state: 'RJ', lat: -22.5231, lng: -44.1042 },
   { city: 'Belo Horizonte', state: 'MG', lat: -19.916681, lng: -43.934493 },
-  { city: 'Feira de Santana', state: 'BA', lat: -12.2567, lng: -38.9592 },
-  { city: 'Caruaru', state: 'PE', lat: -8.2816, lng: -35.9761 },
-  { city: 'Salvador', state: 'BA', lat: -12.977749, lng: -38.501630 },
-  { city: 'Recife', state: 'PE', lat: -8.047562, lng: -34.876964 },
-  { city: 'Brasília', state: 'DF', lat: -15.797515, lng: -47.891887 },
-  { city: 'Porto Alegre', state: 'RS', lat: -30.034647, lng: -51.217658 },
-  { city: 'Fortaleza', state: 'CE', lat: -3.731862, lng: -38.526670 },
   { city: 'Uberlândia', state: 'MG', lat: -18.9186, lng: -48.2772 },
+  { city: 'Juiz de Fora', state: 'MG', lat: -21.7642, lng: -43.3503 },
+  { city: 'Vitória', state: 'ES', lat: -20.3155, lng: -40.3128 },
+
+  // Northeast
+  { city: 'Fortaleza', state: 'CE', lat: -3.731862, lng: -38.526670 },
+  { city: 'Sobral', state: 'CE', lat: -3.6883, lng: -40.3497 },
+  { city: 'Juazeiro do Norte', state: 'CE', lat: -7.2289, lng: -39.3142 },
+  { city: 'Salvador', state: 'BA', lat: -12.977749, lng: -38.501630 },
+  { city: 'Feira de Santana', state: 'BA', lat: -12.2567, lng: -38.9592 },
+  { city: 'Recife', state: 'PE', lat: -8.047562, lng: -34.876964 },
+  { city: 'Caruaru', state: 'PE', lat: -8.2816, lng: -35.9761 },
+  { city: 'Petrolina', state: 'PE', lat: -9.3891, lng: -40.5028 },
+  { city: 'São Luís', state: 'MA', lat: -2.5307, lng: -44.3068 },
+  { city: 'Teresina', state: 'PI', lat: -5.0919, lng: -42.8034 },
+  { city: 'Natal', state: 'RN', lat: -5.7945, lng: -35.2110 },
+  { city: 'João Pessoa', state: 'PB', lat: -7.1195, lng: -34.8450 },
+  { city: 'Maceió', state: 'AL', lat: -9.6658, lng: -35.7353 },
+
+  // South
+  { city: 'Curitiba', state: 'PR', lat: -25.428954, lng: -49.267137 },
   { city: 'Londrina', state: 'PR', lat: -23.3321, lng: -51.1738 },
+  { city: 'Maringá', state: 'PR', lat: -23.4210, lng: -51.9331 },
+  { city: 'Florianópolis', state: 'SC', lat: -27.595378, lng: -48.548050 },
+  { city: 'Joinville', state: 'SC', lat: -26.3045, lng: -48.8464 },
+  { city: 'Porto Alegre', state: 'RS', lat: -30.034647, lng: -51.217658 },
   { city: 'Caxias do Sul', state: 'RS', lat: -29.1681, lng: -51.1794 },
+  { city: 'Pelotas', state: 'RS', lat: -31.7654, lng: -52.3376 },
+
+  // Midwest
+  { city: 'Brasília', state: 'DF', lat: -15.797515, lng: -47.891887 },
+  { city: 'Goiânia', state: 'GO', lat: -16.686891, lng: -49.264794 },
+  { city: 'Anápolis', state: 'GO', lat: -16.3267, lng: -48.9534 },
+  { city: 'Cuiabá', state: 'MT', lat: -15.6014, lng: -56.0979 },
+  { city: 'Campo Grande', state: 'MS', lat: -20.4697, lng: -54.6201 },
+
+  // North
+  { city: 'Manaus', state: 'AM', lat: -3.119028, lng: -60.021731 },
+  { city: 'Belém', state: 'PA', lat: -1.455755, lng: -48.490180 },
+  { city: 'Palmas', state: 'TO', lat: -10.2491, lng: -48.3243 },
 ];
 
 export async function POST(req: Request) {

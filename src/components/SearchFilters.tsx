@@ -500,17 +500,14 @@ export default function SearchFilters() {
             <span>🍕 Interior + Insta sem Site (Oportunidade Ouro)</span>
           </button>
 
-          {/* Quick Filter: Score > 70% */}
+          {/* Quick Filter: Traditional SMBs (< 600 reviews) */}
           <button
-            onClick={() => setFilters({ minScore: filters.minScore === 70 ? 0 : 70 })}
-            className={`px-3 py-1.5 rounded-xl border transition-all flex items-center gap-1.5 ${
-              filters.minScore >= 70
-                ? 'bg-amber-950/80 text-amber-300 border-amber-600 font-semibold shadow-sm'
-                : 'bg-slate-900/80 text-slate-400 border-slate-800 hover:text-slate-200'
-            }`}
+            onClick={() => setFilters({ onlyNoWebsite: true, sortBy: 'score' })}
+            className="px-3 py-1.5 rounded-xl border bg-amber-950/80 hover:bg-amber-900/90 text-amber-300 border-amber-700/80 font-bold transition-all flex items-center gap-1.5 shadow-sm active:scale-95"
+            title="Recomendar em 1º lugar pequenas e médias empresas tradicionais com menos de 600 avaliações sem site próprio"
           >
-            <Flame className="w-3.5 h-3.5 text-amber-400" />
-            <span>Score &gt; 70% (Hot Leads)</span>
+            <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
+            <span>🏆 PMEs Tradicionais (&lt; 600 Avaliações) em 1º Lugar</span>
           </button>
 
           {/* Minimum Reviews Selector */}
