@@ -241,7 +241,7 @@ REGRAS RÍGIDAS DE SELEÇÃO:
 1. DISTRIBUIÇÃO NACIONAL: Distribua as empresas entre cidades de DIFERENTES ESTADOS do Brasil (ex: Sorocaba-SP, Ribeirão Preto-SP, Uberlândia-MG, Feira de Santana-BA, Caruaru-PE, Sobral-CE, Mossoró-RN, Patos-PB, Londrina-PR, Caxias do Sul-RS, Anápolis-GO, Dourados-MS, Rondonópolis-MT, Belém-PA, Manaus-AM, etc.).
 2. FOCO TOTAL EM PMEs TRADICIONAIS: Priorize empresas com MENOS DE 600 AVALIAÇÕES no Google ("reviewsCount": entre 25 e 490).
 3. A maioria NÃO POSSUI WEBSITE ATIVO ("hasWebsite": false).
-4. Inclua apenas telefones autênticos com DDD correto da região da cidade.
+4. APENAS NÚMEROS CELULARES ATIVOS DE WHATSAPP: Retorne APENAS telefones celulares de 9 dígitos (DDD + 9XXXX-XXXX, ex: "11998123445", "85998765432"). DESCARTE E REJEITE TELEFONES FIXOS ANTIGOS (que começam com 2, 3, 4 ou 5) E NÚMEROS DESATIVADOS!
 
 Formato JSON estrito por item:
 [

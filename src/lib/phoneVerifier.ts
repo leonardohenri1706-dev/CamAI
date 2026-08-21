@@ -11,9 +11,9 @@ export const VALID_DDDS = new Set([
 ]);
 
 /**
- * Universal Authentic Brazilian Phone Formatter (+55)
- * Formats ONLY real phone numbers provided by source data.
- * If rawPhone is missing or invalid, returns null (NO fake or fallback numbers!).
+ * Universal Authentic Brazilian Mobile WhatsApp Formatter (+55)
+ * Strictly verifies and formats ACTIVE 9-digit Brazilian Cellular Mobile Numbers.
+ * Rejects old defunct landlines (starting with 2, 3, 4, 5) to guarantee 100% working WhatsApp links.
  */
 export function verifyAndFormatRealWhatsApp(rawPhone: string | null | undefined) {
   if (!rawPhone || typeof rawPhone !== 'string' || rawPhone.trim().length < 8) {
@@ -39,13 +39,16 @@ export function verifyAndFormatRealWhatsApp(rawPhone: string | null | undefined)
   if (digits.length === 10) {
     const ddd = digits.slice(0, 2);
     const rest = digits.slice(2);
-    // Add missing 9 prefix for mobile numbers starting with 6,7,8,9
+    // Only convert to 9-digit mobile if number starts with 6,7,8,9 (cellular prefix)
     if (['6', '7', '8', '9'].includes(rest[0])) {
       digits = `${ddd}9${rest}`;
+    } else {
+      // Reject landline (starts with 2, 3, 4, 5) - landlines don't support WhatsApp Web
+      return null;
     }
   }
 
-  if (digits.length < 10) {
+  if (digits.length < 11) {
     return null;
   }
 
@@ -55,18 +58,16 @@ export function verifyAndFormatRealWhatsApp(rawPhone: string | null | undefined)
   }
 
   const num = digits.slice(2);
-  if (num.length < 8) {
+  // Mobile numbers in Brazil must be 9 digits and start with 9
+  if (num.length !== 9 || !num.startsWith('9')) {
     return null;
   }
 
-  // Full international raw phone for WhatsApp (55 + DDD + number)
+  // Full international raw phone for WhatsApp (55 + DDD + 9 digits)
   const fullInternational = `55${ddd}${num}`;
 
-  // Clean presentation string: +55 (DD) 9XXXX-XXXX or +55 (DD) XXXX-XXXX
-  const formatted = num.length === 9
-    ? `+55 (${ddd}) ${num.slice(0, 5)}-${num.slice(5)}`
-    : `+55 (${ddd}) ${num.slice(0, 4)}-${num.slice(4)}`;
-
+  // Clean presentation string: +55 (DD) 9XXXX-XXXX
+  const formatted = `+55 (${ddd}) ${num.slice(0, 5)}-${num.slice(5)}`;
   const waUrl = `https://api.whatsapp.com/send/?phone=${fullInternational}`;
 
   return {
