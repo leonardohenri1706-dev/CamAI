@@ -433,10 +433,11 @@ export default function SearchFilters() {
       <div className="flex flex-wrap items-center gap-1.5 text-xs pt-1">
         <span className="text-[11px] text-slate-400 font-bold mr-1">Atalhos rápidos:</span>
         {[
+          { label: '⭐ +600 Avaliações', val: 'estabelecimentos com mais de 600 avaliacoes' },
           { label: '📌 #hamburgueria', val: '#hamburgueria' },
           { label: '📌 #delivery', val: '#delivery' },
-          { label: '📌 #barbearia', val: '#barbearia' },
           { label: '📌 #pizzaria', val: '#pizzaria' },
+          { label: '📌 #barbearia', val: '#barbearia' },
           { label: '📍 Aracati - CE', val: 'Aracati' },
           { label: '📍 Mossoró - RN', val: 'Mossoró' },
           { label: '📍 Fortaleza - CE', val: 'Fortaleza' },
