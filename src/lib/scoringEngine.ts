@@ -125,120 +125,55 @@ export function generateCustomPitch(
   demoUrl?: string
 ): string {
   const shortName = placeName.split('-')[0].trim();
-  const rating = digitalHealth.rating || 4.8;
-  const reviewsCount = digitalHealth.reviewsCount || 95;
-  const liveDemo = demoUrl || 'https://botclientes.vercel.app';
+  const liveDemo = demoUrl || 'https://pizzaria-arteedelicia.vercel.app/';
   const catLower = category.toLowerCase();
 
   const inCeara = isCearaLocation(placeName, digitalHealth);
-  const regionPhrase = inCeara ? 'aqui no Ceará' : 'em todo o Brasil';
+  const regionPhrase = inCeara ? 'aqui no Ceará e no Nordeste' : 'no setor gastronômico e comercial';
 
-  let sector = 'empresas de delivery e comércio local';
-  let specificRecognition = `🏆 Parabéns pelo excelente trabalho na ${shortName} (${rating} ★ com ${reviewsCount} avaliações no Google)!`;
-  let primaryBenefit = '💰 Economia de 12% a 27% de faturamento em comissões de marketplaces terceiros.';
-  let secondaryBenefit = '⚡ Atendimento 100% automático no WhatsApp sem filas e sem atrasos.';
-  let automationDetail = 'O pedido/agendamento chega calculado com endereço, itens e taxa de entrega pronto no WhatsApp.';
-  let timingCta = 'antes do próximo pico de atendimento';
-  let onboardingText = `Monto toda a plataforma com a logo, fotos e catálogo completo da ${shortName}.`;
+  let sector = 'setor gastronômico e comércio local';
+  let mainIcon = '🍕';
+  let painDescription = `elimina o atraso no WhatsApp nos dias de pico (quinta a domingo) e substitui o envio manual de cardápio.`;
+  let automatedDetail = `A comanda chega calculada com endereço, taxa de entrega por bairro e detalhes de borda/recheio prontos para a cozinha.`;
+  let timingCta = `antes de abrir o forno`;
+  let onboardingText = `Posso parametrizar todo o sistema com a marca, fotos e cardápio completo da *${shortName}*.`;
 
   if (catLower.includes('hamburg') || catLower.includes('burger') || catLower.includes('lanche')) {
-    sector = 'hamburguerias & lanches';
-    specificRecognition = `🏆 Parabéns pela reputação da ${shortName} (${rating} ★ com ${reviewsCount} avaliações no Google)!`;
-    primaryBenefit = '💰 Lucro Líquido Direto: Elimina taxas de 12% a 27% mantendo 100% da margem das suas vendas.';
-    secondaryBenefit = '🔥 Atendimento Sem Gargalos: Clientes fazem o pedido completo pelo WhatsApp sem sobrecarregar a equipe.';
-    automationDetail = 'O pedido chega formatado com ponto da carne, adicionais, taxa por bairro e pronto para a chapa.';
-    timingCta = 'antes de abrir a chapa hoje';
-    onboardingText = `Posso parametrizar o sistema com a identidade visual, fotos dos burgers e cardápio da ${shortName}.`;
-  } else if (catLower.includes('pizza')) {
-    sector = 'pizzarias & gastronomia';
-    specificRecognition = `🏆 Acompanhando o alto fluxo e sucesso da ${shortName} (${rating} ★ no Google com ${reviewsCount} avaliações)!`;
-    primaryBenefit = '💰 100% de Vendas Diretas: Elimina comissões de terceiros e fideliza o cliente com sua própria marca.';
-    secondaryBenefit = '🍕 Agilidade nos Dias de Pico: Fim da lentidão de respostas manuais e envio de PDF pesado.';
-    automationDetail = 'Comanda calculada com pizzas meia-a-meia, bordas recheadas e taxa por bairro pronta para a cozinha.';
-    timingCta = 'antes de acender o forno hoje';
-    onboardingText = `Montamos a plataforma totalmente personalizada com a marca e cardápio da ${shortName}.`;
+    sector = 'setor de hamburguerias e delivery';
+    mainIcon = '🍔';
+    painDescription = `elimina o atraso no WhatsApp nos dias de pico (quinta a domingo) e substitui o envio manual de cardápio.`;
+    automatedDetail = `O pedido chega calculado com ponto da carne, adicionais, taxa de entrega por bairro e pronto para a chapa.`;
+    timingCta = `antes de abrir a chapa`;
+    onboardingText = `Posso parametrizar todo o sistema com a marca, fotos e cardápio completo da *${shortName}*.`;
   } else if (catLower.includes('barber') || catLower.includes('salao') || catLower.includes('beleza') || catLower.includes('cabelo')) {
-    sector = 'barbearias e estética';
-    specificRecognition = `🏆 Excelente trabalho e forte engajamento na ${shortName} (${rating} ★ no Google com ${reviewsCount} avaliações)!`;
-    primaryBenefit = '📅 Agendamento Automático 24/7: Clientes marcam horários sem você precisar parar o atendimento.';
-    secondaryBenefit = '🚫 Lembretes Anti-Falta: Reduz em até 80% o no-show enviando lembretes automáticos no WhatsApp.';
-    automationDetail = 'O cliente escolhe o profissional, serviço e horário disponível com confirmação instantânea.';
-    timingCta = 'antes de fechar a agenda da semana';
-    onboardingText = `Cadastramos os profissionais, fotos e serviços da ${shortName}.`;
-  } else if (catLower.includes('oficina') || catLower.includes('mecanica') || catLower.includes('auto') || catLower.includes('car')) {
+    sector = 'setor de barbearias e estética';
+    mainIcon = '💈';
+    painDescription = `elimina a perda de tempo no WhatsApp respondendo agendamentos e reduz faltas de clientes sem aviso.`;
+    automatedDetail = `O agendamento entra 24h em tempo real com profissional, serviço e horário confirmado no WhatsApp.`;
+    timingCta = `antes de fechar a agenda da semana`;
+    onboardingText = `Posso parametrizar todo o sistema com os profissionais, fotos e serviços da *${shortName}*.`;
+  } else if (catLower.includes('oficina') || catLower.includes('mecanica') || catLower.includes('auto')) {
     sector = 'serviços automotivos';
-    specificRecognition = `🏆 Acompanhando o movimento e a reputação da ${shortName} (${rating} ★ no Google)!`;
-    primaryBenefit = '🔧 Orçamentos Aprovados Mais Rápido: Envie propostas com foto da peça e valores com aprovação em 1 clique.';
-    secondaryBenefit = '📱 Comunicação Organizada: Fim da perda de ordens de serviço e mensagens perdidas no WhatsApp.';
-    automationDetail = 'Cliente recebe a ordem de serviço detalhada com fotos e autoriza no WhatsApp com agilidade.';
-    timingCta = 'no início do expediente';
-    onboardingText = `Estruturamos toda a tabela de serviços e dados da ${shortName}.`;
-  } else if (catLower.includes('clinica') || catLower.includes('odonto') || catLower.includes('saude') || catLower.includes('dentista')) {
-    sector = 'saúde & odontologia';
-    specificRecognition = `🏆 Destaque em atendimento e avaliações na ${shortName} (${rating} ★ no Google com ${reviewsCount} avaliações)!`;
-    primaryBenefit = '🏥 Recepção Desafogada: Triagem e confirmação automática de consultas no WhatsApp.';
-    secondaryBenefit = '⏱️ Menos Faltas: Envio automático de orientações pré-consulta e confirmação imediata de presença.';
-    automationDetail = 'Pacientes escolhem datas, confirmam procedimentos e recebem lembretes sem tomar tempo da secretária.';
-    timingCta = 'antes de abrir o consultório hoje';
-    onboardingText = `Personalizamos todo o fluxo para as especialidades da ${shortName}.`;
+    mainIcon = '🚗';
+    painDescription = `elimina o atraso na aprovação de orçamentos e organiza as ordens de serviço direto no WhatsApp.`;
+    automatedDetail = `O orçamento com fotos e valores é aprovado em 1 clique pelo cliente no WhatsApp.`;
+    timingCta = `no início do expediente`;
+    onboardingText = `Posso parametrizar todo o sistema com a tabela de serviços da *${shortName}*.`;
   }
 
-  // MULTI-CTA HIGH-CONVERSION PITCH (Tones)
-  if (tone === 'direct') {
-    return (
-      `Olá, equipe da *${shortName}*! Tudo bem?\n\n` +
-      `Meu nome é *${devName}*, sou especialista em soluções tecnológicas de vendas para ${sector} ${regionPhrase}.\n\n` +
-      `${specificRecognition}\n\n` +
-      `Desenvolvemos uma aplicação web de canal próprio direto no WhatsApp para potencializar o faturamento da *${shortName}*:\n\n` +
-      `✨ *PRINCIPAIS BENEFÍCIOS DO NOSSO PRODUTO:*\n` +
-      `${primaryBenefit}\n` +
-      `${secondaryBenefit}\n` +
-      `⚙️ *Como Funciona:* ${automationDetail}\n\n` +
-      `👇 *VEJA A TECNOLOGIA EM AÇÃO NA PRÁTICA:* 👇\n` +
-      `👉 *Clique Aqui para Testar a Demonstração ao Vivo:* ${liveDemo}\n\n` +
-      `🎁 *OFERTA ESPECIAL:* ${onboardingText} e colocamos no ar ${timingCta}!\n\n` +
-      `📲 *COMO DESEJA PROSSEGUIR?*\n` +
-      `1️⃣ Responda com a palavra *SIM* para receber a versão personalizada sem custo.\n` +
-      `2️⃣ Ou me diga qual o melhor horário hoje para uma conversa rápida de 3 minutos!`
-    );
-  }
-
-  if (tone === 'promotional') {
-    return (
-      `🔥 *OPORTUNIDADE DE EXPANSÃO PARA A ${shortName.toUpperCase()}!* 🔥\n\n` +
-      `Olá, gestor da *${shortName}*! Tudo bem?\n\n` +
-      `Meu nome é *${devName}* e ajudo ${sector} ${regionPhrase} a multiplicarem suas vendas diretas sem pagar comissões para terceiros.\n\n` +
-      `${specificRecognition}\n\n` +
-      `🚀 *BENEFÍCIOS EXCLUSIVOS DO NOSSO SISTEMA WEB:* \n` +
-      `1. ${primaryBenefit}\n` +
-      `2. ${secondaryBenefit}\n` +
-      `3. 📲 *Vendas Automatizadas:* ${automationDetail}\n\n` +
-      `👇 *ACESSE A DEMONSTRAÇÃO COMPLETA AO VIVO:* 👇\n` +
-      `🔗 *Testar Sistema em Tempo Real:* ${liveDemo}\n\n` +
-      `🎁 *CONDIÇÃO EXCLUSIVA DE IMPLANTAÇÃO:* ${onboardingText} sem taxa de adesão inicial!\n\n` +
-      `👇 *ESCOLHA SUA OPÇÃO DE ATENDIMENTO:* 👇\n` +
-      `💬 Responda *QUERO TESTAR* para ativarmos sua demonstração personalizada agora mesmo!\n` +
-      `📞 Ou me diga o melhor horário para ligar para você hoje!`
-    );
-  }
-
-  // DEFAULT / CONSULTIVE (High-Conversion Master Standard)
+  // USER'S MASTER PROMPT TEMPLATE (Dynamic with Emojis & Bold formatting)
   return (
-    `Olá, responsável pela *${shortName}*, tudo bem?\n\n` +
-    `Meu nome é *${devName}*, sou especialista em engenharia de softwares comerciais e desenvolvo soluções de alto lucro para ${sector} ${regionPhrase}.\n\n` +
-    `${specificRecognition}\n\n` +
-    `Estruturamos um sistema exclusivo de vendas e atendimento via WhatsApp para a *${shortName}*:\n\n` +
-    `💎 *BENEFÍCIOS REAIS DO NOSSO PRODUTO:*\n` +
-    `• ${primaryBenefit}\n` +
-    `• ${secondaryBenefit}\n` +
-    `• 🎯 *Automação Inteligente:* ${automationDetail}\n\n` +
-    `👇 *EXPERIMENTE A PLATAFORMA EM FUNCIONAMENTO:* 👇\n` +
-    `👉 *Clique para Testar a Demonstração ao Vivo:* ${liveDemo}\n\n` +
-    `📋 *COMO IMPLANTAMOS NA SUA EMPRESA:*\n` +
-    `1. ${onboardingText}\n` +
-    `2. Deixamos tudo testado e pronto para operar ${timingCta}.\n\n` +
-    `📲 *PRÓXIMOS PASSOS (CHAMADAS DE AÇÃO):*\n` +
-    `👉 Responda *SIM* para receber a versão grátis com a marca da ${shortName}.\n` +
-    `👉 Ou me diga qual o melhor horário para um bate-papo de 3 minutos hoje!`
+    `👋 *Olá, responsável pela ${shortName}, tudo bem?*\n\n` +
+    `👨‍💻 Meu nome é *${devName}*, sou engenheiro de software e desenvolvo soluções digitais focadas em redução de custos operacionais para o ${sector} ${regionPhrase}.\n\n` +
+    `${mainIcon} Analisando o atendimento de estabelecimentos com alto volume como a *${shortName}*, estruturei uma aplicação web de pedidos diretos que ${painDescription}\n\n` +
+    `🚀 *Principais ganhos com a plataforma:*\n\n` +
+    `💰 *Economia imediata:* Seus clientes compram direto de você, sem você repassar 12% a 25% do faturamento para apps de terceiros.\n\n` +
+    `⚡ *Atendimento automatizado:* ${automatedDetail}\n\n` +
+    `🌐 *Veja a plataforma rodando em tempo real:*\n` +
+    `🔗 *Clique aqui para testar o sistema:* ${liveDemo}\n\n` +
+    `📋 *Próximos passos para implantar no seu negócio:*\n\n` +
+    `✨ ${onboardingText}\n\n` +
+    `📦 Se fizer sentido para o seu delivery/negócio, coloco a sua operação rodando no ar esta semana.\n\n` +
+    `📲 *Podemos alinhar isso hoje ${timingCta}?* Me responde aqui com um '*SIM*' ou me diga qual o melhor horário para conversarmos rapidamente! 🔥`
   );
 }

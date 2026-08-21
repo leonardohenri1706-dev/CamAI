@@ -51,25 +51,38 @@ export async function POST(req: Request) {
                 messages: [
                   {
                     role: 'system',
-                    content: `Você é um especialista em Copywriting B2B de altíssima conversão para WhatsApp Web no Brasil.
-Escreva uma mensagem extremamente bem estruturada e organizada para o responsável do estabelecimento "*${lead.displayName}*".
+                    content: `Você é um copywriter B2B sênior de altíssima conversão para WhatsApp Web no Brasil.
+Escreva uma mensagem de WhatsApp persuasiva para o responsável do estabelecimento "*${lead.displayName}*", seguindo ESTRITAMENTE o modelo de pitch abaixo enriquecido com emojis dinâmicos e *negritos*:
 
-A mensagem DEVE seguir a seguinte estrutura obrigatória:
-1. Saudação personalizada com elogio e prova social (${lead.digitalHealth.rating}★ com ${lead.digitalHealth.reviewsCount} avaliações no Google).
-2. Título "*BENEFÍCIOS REAIS DO NOSSO PRODUTO:*" com marcadores destacando:
-   - 💰 Economia de 12% a 27% de comissão.
-   - ⚡ Atendimento 100% automático no WhatsApp.
-   - 🎯 Vendas diretas pela própria marca.
-3. Link de demonstração em destaque: "👉 *Clique para Testar a Demonstração ao Vivo:* https://botclientes.vercel.app".
-4. *MÚLTIPLOS CTAS (Chamadas de Ação):*
-   - 👉 Responda "SIM" para receber a versão grátis com a marca da empresa.
-   - 👉 Ou me diga o melhor horário para um bate-papo rápido de 3 minutos hoje.
+MODELO OBRIGATÓRIO:
+👋 *Olá, responsável pela ${lead.displayName}, tudo bem?*
 
-Retorne apenas o texto final formatado para WhatsApp com emojis e *negritos*. Não use placeholders.`,
+👨‍💻 Meu nome é Leonardo, sou engenheiro de software e desenvolvo soluções digitais focadas em redução de custos operacionais para o setor de ${lead.category} aqui no Nordeste e Brasil.
+
+🍕 Analisando o atendimento de estabelecimentos com alto volume como a *${lead.displayName}*, estruturei uma aplicação web de pedidos diretos que elimina o atraso no WhatsApp nos dias de pico (quinta a domingo) e substitui o envio manual de cardápio.
+
+🚀 *Principais ganhos com a plataforma:*
+
+💰 *Economia imediata:* Seus clientes compram direto de você, sem você repassar 12% a 25% do faturamento para apps de terceiros.
+
+⚡ *Atendimento automatizado:* A comanda/pedido chega calculada com endereço, taxa de entrega por bairro e detalhes dos itens prontos para a cozinha/equipe.
+
+🌐 *Veja a plataforma rodando em tempo real:*
+🔗 *Clique aqui para testar o sistema:* https://pizzaria-arteedelicia.vercel.app/
+
+📋 *Próximos passos para implantar no seu negócio:*
+
+✨ Posso parametrizar todo o sistema com a marca, fotos e cardápio/catálogo completo da *${lead.displayName}*.
+
+📦 Se fizer sentido para a sua operação, coloco tudo rodando no ar esta semana.
+
+📲 *Podemos alinhar isso hoje antes de abrir o forno/expediente?* Me responde aqui com um '*SIM*' ou me diga qual o melhor horário para conversarmos rapidamente! 🔥
+
+Retorne APENAS o texto final formatado para WhatsApp. Não use placeholders genéricos.`,
                   },
                 ],
-                max_tokens: 450,
-                temperature: 0.6,
+                max_tokens: 500,
+                temperature: 0.5,
               }),
             });
 
