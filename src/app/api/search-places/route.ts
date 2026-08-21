@@ -70,9 +70,8 @@ const OVERPASS_ENDPOINTS = [
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { category, searchMode, openrouterApiKey, openrouterModel } = body;
+    const { category, openrouterApiKey, openrouterModel } = body;
 
-    const isDeepMode = searchMode === 'deep';
     const targetCategory = (category && category !== 'todas') ? category : 'Todas as PMEs';
     const openrouterKey = (openrouterApiKey && openrouterApiKey.trim().length > 5)
       ? openrouterApiKey.trim()
@@ -99,10 +98,11 @@ export async function POST(req: Request) {
 
       if (catMatch) {
         if (seenNames.has(item.displayName.toLowerCase())) continue;
-        seenNames.add(item.displayName.toLowerCase());
 
         const verified = verifyAndFormatRealWhatsApp(item.phone);
+        if (!verified || !verified.hasWhatsApp || !verified.rawPhone) continue;
 
+        seenNames.add(item.displayName.toLowerCase());
         realLeads.push({
           id: `real_db_${realLeads.length + 1}`,
           displayName: item.displayName,
@@ -115,10 +115,10 @@ export async function POST(req: Request) {
           digitalHealth: {
             hasWebsite: Boolean(item.hasWebsite && item.websiteUrl),
             websiteUrl: item.websiteUrl || null,
-            hasWhatsApp: Boolean(verified),
-            isVerified: Boolean(verified),
-            formattedPhone: verified ? verified.formattedPhone : null,
-            rawPhone: verified ? verified.rawPhone : null,
+            hasWhatsApp: true,
+            isVerified: true,
+            formattedPhone: verified.formattedPhone,
+            rawPhone: verified.rawPhone,
             rating: item.rating,
             reviewsCount: item.reviewsCount,
             googleMapsUri: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.displayName + ' ' + item.city)}`,
@@ -131,12 +131,11 @@ export async function POST(req: Request) {
       }
     }
 
-    // 2. OpenStreetMap Overpass Multi-Mirror Scans (Nationwide 26 States)
-    const targetMetros = isDeepMode ? BRAZIL_METRO_REGIONS : BRAZIL_METRO_REGIONS.slice(0, 12);
+    // 2. OpenStreetMap Overpass Multi-Mirror Scans (All 40+ Brazilian Metro Regions in Parallel)
     const targetLower = targetCategory.toLowerCase();
 
     const fetchMetroOverpass = async (metro: typeof BRAZIL_METRO_REGIONS[0]) => {
-      const radius = isDeepMode ? 0.45 : 0.25;
+      const radius = 0.45;
       const bboxSouth = metro.lat - radius;
       const bboxWest = metro.lng - radius;
       const bboxNorth = metro.lat + radius;
@@ -151,13 +150,13 @@ export async function POST(req: Request) {
         overpassBody = `node["amenity"~"dentist|clinic|doctors"](${bboxSouth.toFixed(4)}, ${bboxWest.toFixed(4)}, ${bboxNorth.toFixed(4)}, ${bboxEast.toFixed(4)});`;
       }
 
-      const limit = isDeepMode ? 1000 : 150;
+      const limit = 1000;
       const query = `[out:json][timeout:25];(${overpassBody});out tags center ${limit};`;
 
       for (const endpoint of OVERPASS_ENDPOINTS) {
         try {
           const controller = new AbortController();
-          const timeoutId = setTimeout(() => controller.abort(), isDeepMode ? 10000 : 4000);
+          const timeoutId = setTimeout(() => controller.abort(), 10000);
 
           const res = await fetch(endpoint, {
             method: 'POST',
@@ -183,12 +182,11 @@ export async function POST(req: Request) {
       return [];
     };
 
-    const metroResults = await Promise.allSettled(targetMetros.map(fetchMetroOverpass));
+    const metroResults = await Promise.allSettled(BRAZIL_METRO_REGIONS.map(fetchMetroOverpass));
 
     for (const res of metroResults) {
       if (res.status === 'fulfilled' && Array.isArray(res.value)) {
         for (const el of res.value) {
-          if (realLeads.length >= 10000) break;
           const tags = el.tags || {};
           const name = tags.name;
           if (!name || name.length < 3) continue;
@@ -200,7 +198,7 @@ export async function POST(req: Request) {
 
           seenNames.add(name.toLowerCase());
           const instaRaw = tags['contact:instagram'] || tags.instagram;
-          const instaHandle = instaRaw ? (instaRaw.startsWith('@') ? instaRaw : `@${instaRaw.split('/').pop()}`) : undefined;
+          const instaHandle = (instaRaw && instaRaw.startsWith('@') && instaRaw.length > 3) ? instaRaw : undefined;
 
           realLeads.push({
             id: `osm_${el.id}`,
@@ -214,10 +212,10 @@ export async function POST(req: Request) {
             digitalHealth: {
               hasWebsite: Boolean(tags.website || tags['contact:website']),
               websiteUrl: tags.website || tags['contact:website'] || null,
-              hasWhatsApp: Boolean(verified),
-              isVerified: Boolean(verified),
-              formattedPhone: verified ? verified.formattedPhone : null,
-              rawPhone: verified ? verified.rawPhone : null,
+              hasWhatsApp: true,
+              isVerified: true,
+              formattedPhone: verified.formattedPhone,
+              rawPhone: verified.rawPhone,
               rating: 4.5 + Math.round(Math.random() * 4) / 10,
               reviewsCount: Math.floor(Math.random() * 350) + 30,
               googleMapsUri: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(name + ' ' + el._metroCity)}`,
@@ -231,21 +229,19 @@ export async function POST(req: Request) {
       }
     }
 
-    // 3. OpenRouter AI Prospecting Engine (Guaranteed AI Lead Generation Across ALL 26 States)
-    if (openrouterKey && realLeads.length < 10000) {
+    // 3. OpenRouter AI Prospecting Engine (Unified Nationwide AI Prospector for all 26 States + DF)
+    if (openrouterKey) {
       try {
-        const countToFetch = isDeepMode ? 100 : 50;
         const aiPrompt = `Atue como o maior motor de inteligência de prospecção B2B de PMEs no Brasil.
-Você possui acesso a TODOS OS 2.400+ MUNICÍPIOS DO BRASIL COM MAIS DE 7.000 HABITANTES espalhados pelos 26 estados e Distrito Federal.
+Você possui acesso a TODOS OS MUNICÍPIOS DO BRASIL espalhados pelos 26 estados e Distrito Federal.
 
-Gere um array JSON com ${countToFetch} pequenos e médios estabelecimentos comerciais autênticos da categoria "${targetCategory}" espalhados por CIDADES DE DIVERSOS ESTADOS DO BRASIL (SP, RJ, MG, ES, PR, SC, RS, BA, PE, CE, MA, PB, RN, AL, SE, PI, GO, MT, MS, DF, AM, PA, TO, RO).
+Gere um array JSON com 100 pequenos e médios estabelecimentos comerciais autênticos da categoria "${targetCategory}" espalhados por CIDADES DE DIVERSOS ESTADOS DO BRASIL (SP, RJ, MG, ES, PR, SC, RS, BA, PE, CE, MA, PB, RN, AL, SE, PI, GO, MT, MS, DF, AM, PA, TO, RO).
 
 REGRAS RÍGIDAS DE SELEÇÃO:
-1. DISTRIBUIÇÃO NACIONAL: Distribua as empresas entre cidades de DIFERENTES ESTADOS do Brasil (ex: Sorocaba-SP, Ribeirão Preto-SP, Uberlândia-MG, Feira de Santana-BA, Caruaru-PE, Sobral-CE, Mossoró-RN, Patos-PB, Londrina-PR, Caxias do Sul-RS, Anápolis-GO, Dourados-MS, Rondonópolis-MT, Belém-PA, Manaus-AM, etc.). NÃO concentre apenas no Ceará.
+1. DISTRIBUIÇÃO NACIONAL: Distribua as empresas entre cidades de DIFERENTES ESTADOS do Brasil (ex: Sorocaba-SP, Ribeirão Preto-SP, Uberlândia-MG, Feira de Santana-BA, Caruaru-PE, Sobral-CE, Mossoró-RN, Patos-PB, Londrina-PR, Caxias do Sul-RS, Anápolis-GO, Dourados-MS, Rondonópolis-MT, Belém-PA, Manaus-AM, etc.).
 2. FOCO TOTAL EM PMEs TRADICIONAIS: Priorize empresas com MENOS DE 600 AVALIAÇÕES no Google ("reviewsCount": entre 25 e 490).
 3. A maioria NÃO POSSUI WEBSITE ATIVO ("hasWebsite": false).
-4. Inclua perfil no Instagram quando existente ("instagramHandle": "@perfil_real").
-5. Inclua apenas telefones autênticos com DDD correto da região da cidade.
+4. Inclua apenas telefones autênticos com DDD correto da região da cidade.
 
 Formato JSON estrito por item:
 [
@@ -275,7 +271,7 @@ Retorne APENAS o JSON puro sem markdown ou textos explicativos.`;
           body: JSON.stringify({
             model: openrouterModel || 'openai/gpt-4o-mini',
             messages: [{ role: 'user', content: aiPrompt }],
-            max_tokens: isDeepMode ? 8000 : 4000,
+            max_tokens: 8000,
             temperature: 0.6,
           }),
         });
@@ -290,12 +286,15 @@ Retorne APENAS o JSON puro sem markdown ou textos explicativos.`;
 
             if (Array.isArray(parsedArray)) {
               for (const item of parsedArray) {
-                if (realLeads.length >= 10000) break;
                 if (!item.displayName || seenNames.has(item.displayName.toLowerCase())) continue;
-        const verified = verifyAndFormatRealWhatsApp(item.phone);
-        if (!verified || !verified.hasWhatsApp || !verified.rawPhone) continue;
+                const verified = verifyAndFormatRealWhatsApp(item.phone);
+                if (!verified || !verified.hasWhatsApp || !verified.rawPhone) continue;
 
                 seenNames.add(item.displayName.toLowerCase());
+                const instaHandle = (item.instagramHandle && item.instagramHandle.trim().startsWith('@') && item.instagramHandle.trim().length > 3)
+                  ? item.instagramHandle.trim()
+                  : undefined;
+
                 realLeads.push({
                   id: `ai_openrouter_${realLeads.length + 1}`,
                   displayName: item.displayName,
@@ -311,17 +310,17 @@ Retorne APENAS o JSON puro sem markdown ou textos explicativos.`;
                   digitalHealth: {
                     hasWebsite: Boolean(item.hasWebsite && item.websiteUrl),
                     websiteUrl: item.websiteUrl || null,
-                    hasWhatsApp: Boolean(verified),
-                    isVerified: Boolean(verified),
-                    formattedPhone: verified ? verified.formattedPhone : null,
-                    rawPhone: verified ? verified.rawPhone : null,
+                    hasWhatsApp: true,
+                    isVerified: true,
+                    formattedPhone: verified.formattedPhone,
+                    rawPhone: verified.rawPhone,
                     rating: item.rating || 4.8,
                     reviewsCount: item.reviewsCount || 190,
                     googleMapsUri: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.displayName + ' ' + (item.city || ''))}`,
                     photoUrl: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800&auto=format&fit=crop&q=80',
-                    hasInstagram: Boolean(item.instagramHandle && item.instagramHandle.trim().length > 1),
-                    instagramHandle: item.instagramHandle ? item.instagramHandle.trim() : undefined,
-                    instagramProfileUrl: item.instagramHandle ? `https://instagram.com/${item.instagramHandle.replace('@', '').trim()}` : undefined,
+                    hasInstagram: Boolean(instaHandle),
+                    instagramHandle: instaHandle,
+                    instagramProfileUrl: instaHandle ? `https://instagram.com/${instaHandle.replace('@', '').trim()}` : undefined,
                   },
                 });
               }
@@ -333,16 +332,13 @@ Retorne APENAS o JSON puro sem markdown ou textos explicativos.`;
       }
     }
 
-    const finalLeads = realLeads.slice(0, 10000);
-
     return NextResponse.json({
       success: true,
-      leads: finalLeads,
-      totalCount: finalLeads.length,
-      searchMode: isDeepMode ? 'deep' : 'fast',
+      leads: realLeads,
+      totalCount: realLeads.length,
       center: { lat: -14.235004, lng: -51.92528 },
-      locationName: isDeepMode ? '🔥 Varredura Profunda Ultra-Nacional (Até 10.000 Leads em Todos os Estados)' : '⚡ Busca Rápida Nacional PMEs',
-      city: 'Todo o Brasil (> 7k hab)',
+      locationName: '🚀 Varredura Geral Brasil (OpenRouter AI + Mapas)',
+      city: 'Todo o Brasil (26 Estados + DF)',
       source: 'authentic_sme_prospector_engine',
     });
   } catch (error: any) {
