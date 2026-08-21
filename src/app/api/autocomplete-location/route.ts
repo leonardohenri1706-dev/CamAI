@@ -1,5 +1,9 @@
 import { NextResponse } from 'next/server';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+export const fetchCache = 'force-no-store';
+
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
   const query = searchParams.get('q')?.trim();
@@ -12,6 +16,7 @@ export async function GET(req: Request) {
     const osmRes = await fetch(
       `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&addressdetails=1&limit=6&countrycodes=br`,
       {
+        cache: 'no-store',
         headers: {
           'User-Agent': 'LeadPulse-Next-Autocomplete/1.0',
         },

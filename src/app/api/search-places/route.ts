@@ -3,6 +3,11 @@ import { PlaceLead } from '@/types/prospecting';
 import { verifyAndFormatRealWhatsApp, crawlWebsiteForContacts, checkWhatsAppExists } from '@/lib/phoneVerifier';
 import { VERIFIED_PLACES_DATABASE } from '@/lib/placesDatabase';
 
+// Force 100% dynamic execution on Vercel without data caching
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+export const fetchCache = 'force-no-store';
+
 // OpenRouter API Key Fallback to guarantee AI engine activation
 const DEFAULT_OPENROUTER_KEY = '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';
 
@@ -18,6 +23,7 @@ async function searchAllGooglePlaces(query: string, apiKey: string) {
     try {
       const res = await fetch('https://places.googleapis.com/v1/places:searchText', {
         method: 'POST',
+        cache: 'no-store',
         headers: {
           'Content-Type': 'application/json',
           'X-Goog-Api-Key': apiKey.trim(),
@@ -29,6 +35,7 @@ async function searchAllGooglePlaces(query: string, apiKey: string) {
           pageSize: 20,
         }),
       });
+
 
       if (!res.ok) break;
       const data = await res.json();
@@ -330,6 +337,7 @@ export async function POST(req: Request) {
 
           const res = await fetch(endpoint, {
             method: 'POST',
+            cache: 'no-store',
             headers: {
               'Content-Type': 'application/x-www-form-urlencoded',
               'User-Agent': 'BotClientes-Prospector/2.0',
@@ -452,6 +460,7 @@ Retorne APENAS o JSON puro sem markdown ou textos explicativos.`;
 
         const aiRes = await fetch('https://openrouter.ai/api/v1/chat/completions', {
           method: 'POST',
+          cache: 'no-store',
           headers: {
             'Authorization': `Bearer ${openrouterKey.trim()}`,
             'Content-Type': 'application/json',
