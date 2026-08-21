@@ -21,7 +21,7 @@ async function searchAllGooglePlaces(query: string, apiKey: string) {
 
   do {
     try {
-      const res = await fetch('https://places.googleapis.com/v1/places:searchText', {
+      const placesResponse = await fetch('https://places.googleapis.com/v1/places:searchText', {
         method: 'POST',
         cache: 'no-store',
         headers: {
@@ -36,9 +36,8 @@ async function searchAllGooglePlaces(query: string, apiKey: string) {
         }),
       });
 
-
-      if (!res.ok) break;
-      const data = await res.json();
+      if (!placesResponse.ok) break;
+      const data = await placesResponse.json();
       if (Array.isArray(data.places)) {
         allPlaces.push(...data.places);
       }
@@ -335,7 +334,7 @@ export async function POST(req: Request) {
           const controller = new AbortController();
           const timeoutId = setTimeout(() => controller.abort(), 12000);
 
-          const res = await fetch(endpoint, {
+          const overpassResponse = await fetch(endpoint, {
             method: 'POST',
             cache: 'no-store',
             headers: {
@@ -347,8 +346,8 @@ export async function POST(req: Request) {
           });
 
           clearTimeout(timeoutId);
-          if (res.ok) {
-            const data = await res.json();
+          if (overpassResponse.ok) {
+            const data = await overpassResponse.json();
             if (Array.isArray(data.elements) && data.elements.length > 0) {
               return data.elements.map((el: any) => ({ ...el, _metroCity: metro.city, _metroState: metro.state }));
             }
@@ -362,9 +361,9 @@ export async function POST(req: Request) {
 
     const metroResults = await Promise.allSettled(BRAZIL_METRO_REGIONS.map(fetchMetroOverpass));
 
-    for (const res of metroResults) {
-      if (res.status === 'fulfilled' && Array.isArray(res.value)) {
-        for (const el of res.value) {
+    for (const metroRes of metroResults) {
+      if (metroRes.status === 'fulfilled' && Array.isArray(metroRes.value)) {
+        for (const el of metroRes.value) {
           const tags = el.tags || {};
           const name = tags.name;
           if (!name || name.length < 3) continue;
