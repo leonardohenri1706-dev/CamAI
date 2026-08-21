@@ -215,20 +215,23 @@ export async function POST(req: Request) {
     // 3. OpenRouter AI Prospecting Engine (Authentic SME Leads from Interior & Capital Cities)
     if (openrouterKey && openrouterKey.trim().length > 5) {
       try {
-        const aiPrompt = `Atue como um motor de inteligência de prospecção B2B focado em pequenas e médias empresas (PMEs) no Brasil.
-Gere um array JSON com 35 pequenos estabelecimentos comerciais e pizzarias reais de altíssimo potencial da categoria "${targetCategory}" situados em cidades do interior e capitais do Brasil (ex: Sobral-CE, Juazeiro do Norte-CE, Sorocaba-SP, Ribeirão Preto-SP, Feira de Santana-BA, Caruaru-PE, Uberlândia-MG, Londrina-PR, Caxias do Sul-RS, São Paulo-SP, Fortaleza-CE).
+        const aiPrompt = `Atue como o maior motor de inteligência de prospecção B2B de PMEs no Brasil.
+Você possui acesso a TODOS OS 2.400+ MUNICÍPIOS DO BRASIL COM MAIS DE 7.000 HABITANTES espalhados pelos 26 estados e Distrito Federal.
 
-REGRAS RÍGIDAS DE DADOS:
-1. Retorne APENAS telefones ou WhatsApps autênticos quando existirem.
-2. A maioria NÃO possui website ativo ("hasWebsite": false).
-3. Se a empresa possuir perfil no Instagram, inclua "instagramHandle": "@perfil_real". Se não possuir, omita o atributo ou deixe nulo.
+Gere um array JSON com 50 pequenos e médios estabelecimentos comerciais, pizzarias e empresas de alta oportunidade da categoria "${targetCategory}" situados em cidades com mais de 7 mil habitantes no Brasil (como por exemplo: Tianguá-CE, Itapipoca-CE, Quixadá-CE, Iguatu-CE, Patos-PB, Caicó-RN, Mossoró-RN, Garanhuns-PE, Arcoverde-PE, Feira de Santana-BA, Itabuna-BA, Ilhéus-BA, Poços de Caldas-MG, Varginha-MG, Pouso Alegre-MG, Governador Valadares-MG, Resende-RJ, Cabo Frio-RJ, Araraquara-SP, São Carlos-SP, Marília-SP, Presidente Prudente-SP, Toledo-PR, Umuarama-PR, Chapecó-SC, Criciúma-SC, Lages-SC, Passo Fundo-RS, Santa Maria-RS, Pelotas-RS, Dourados-MS, Rondonópolis-MT, Rio Verde-GO, Santarém-PA, Marabá-PA, Ji-Paraná-RO, Gurupi-TO, etc.).
+
+REGRAS RÍGIDAS DE SELEÇÃO:
+1. FOCO TOTAL EM PMEs TRADICIONAIS: Priorize empresas com MENOS DE 600 AVALIAÇÕES no Google ("reviewsCount": entre 20 e 500).
+2. A maioria NÃO POSSUI WEBSITE ATIVO ("hasWebsite": false).
+3. Inclua perfil no Instagram quando existente ("instagramHandle": "@perfil_real").
+4. Inclua apenas telefones autênticos com DDD correto da região.
 
 Formato JSON estrito por item:
 [
   {
     "displayName": "Nome Real da Empresa",
     "category": "${targetCategory}",
-    "city": "Nome da Cidade",
+    "city": "Nome da Cidade > 7k hab",
     "formattedAddress": "Endereço Completo",
     "neighborhood": "Nome do Bairro",
     "phone": "88998123445",
