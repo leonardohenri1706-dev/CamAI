@@ -45,7 +45,12 @@ export default function Home() {
           const res = await fetch('/api/search-places', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ location: currentLocation, category: 'Hamburgueria' }),
+            body: JSON.stringify({
+              location: currentLocation,
+              category: 'Hamburgueria',
+              searchMode: 'deep',
+              openrouterApiKey: apiSettings.openrouterApiKey || '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',
+            }),
           });
           searchData = await res.json();
         }

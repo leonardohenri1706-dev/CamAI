@@ -200,6 +200,7 @@ export default function SearchFilters() {
             keywords: currentRepo.searchKeywords,
             category: activeCategory,
             searchMode: activeMode,
+            openrouterApiKey: apiSettings.openrouterApiKey || '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',
             googlePlacesApiKey: apiSettings.googlePlacesApiKey,
           }),
         });
