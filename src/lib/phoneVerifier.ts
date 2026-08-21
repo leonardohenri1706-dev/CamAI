@@ -11,63 +11,58 @@ export const VALID_DDDS = new Set([
 ]);
 
 /**
- * Universal Brazilian Phone Formatter (+55)
- * Takes ANY raw phone number input, cleans non-digits, prepends country code 55,
- * formats mobile (11-digit with 9) or landline, and generates a valid WhatsApp link.
+ * Universal Authentic Brazilian Phone Formatter (+55)
+ * Formats ONLY real phone numbers provided by source data.
+ * If rawPhone is missing or invalid, returns null (NO fake or fallback numbers!).
  */
 export function verifyAndFormatRealWhatsApp(rawPhone: string | null | undefined) {
-  if (!rawPhone || typeof rawPhone !== 'string' || rawPhone.trim().length === 0) {
-    return {
-      formattedPhone: '+55 (11) 99123-4455',
-      rawPhone: '5511991234455',
-      hasWhatsApp: true,
-      isVerified: true,
-      ddd: '11',
-      waUrl: 'https://api.whatsapp.com/send/?phone=5511991234455',
-    };
+  if (!rawPhone || typeof rawPhone !== 'string' || rawPhone.trim().length < 8) {
+    return null;
   }
 
   let digits = rawPhone.replace(/\D/g, '');
+
+  if (digits.length < 8) {
+    return null;
+  }
 
   if (digits.startsWith('0')) {
     digits = digits.slice(1);
   }
 
-  // Remove leading country code if already present
+  // Remove leading country code if present
   if (digits.startsWith('55') && digits.length >= 12) {
     digits = digits.slice(2);
   }
 
-  // Handle 10-digit numbers (e.g., 11 9123 4455 or landlines 11 3821 9000)
+  // Handle 10-digit numbers (DDD + 8 digits)
   if (digits.length === 10) {
     const ddd = digits.slice(0, 2);
     const rest = digits.slice(2);
-    // Add missing 9 prefix for mobile numbers if starting with 6,7,8,9
+    // Add missing 9 prefix for mobile numbers starting with 6,7,8,9
     if (['6', '7', '8', '9'].includes(rest[0])) {
       digits = `${ddd}9${rest}`;
     }
   }
 
-  // Default to São Paulo DDD 11 if DDD is missing or invalid
-  let ddd = digits.length >= 2 ? digits.slice(0, 2) : '11';
+  if (digits.length < 10) {
+    return null;
+  }
+
+  const ddd = digits.slice(0, 2);
   if (!VALID_DDDS.has(ddd)) {
-    ddd = '11';
+    return null;
   }
 
-  let num = digits.length > 2 ? digits.slice(2) : '991234455';
+  const num = digits.slice(2);
   if (num.length < 8) {
-    num = '991234455';
+    return null;
   }
 
-  // Ensure mobile 9 prefix if 8 digits starting with 6,7,8,9
-  if (num.length === 8 && ['6', '7', '8', '9'].includes(num[0])) {
-    num = `9${num}`;
-  }
-
-  // Full 13-digit international raw phone for WhatsApp (55 + DDD + 9 digits)
+  // Full international raw phone for WhatsApp (55 + DDD + number)
   const fullInternational = `55${ddd}${num}`;
 
-  // Clean presentation string: +55 (DD) 9XXXX-XXXX
+  // Clean presentation string: +55 (DD) 9XXXX-XXXX or +55 (DD) XXXX-XXXX
   const formatted = num.length === 9
     ? `+55 (${ddd}) ${num.slice(0, 5)}-${num.slice(5)}`
     : `+55 (${ddd}) ${num.slice(0, 4)}-${num.slice(4)}`;
@@ -86,6 +81,9 @@ export function verifyAndFormatRealWhatsApp(rawPhone: string | null | undefined)
 
 export function buildWhatsAppLink(rawPhone: string | null | undefined, messageText?: string) {
   const verified = verifyAndFormatRealWhatsApp(rawPhone);
+  if (!verified || !verified.rawPhone) {
+    return '';
+  }
   const cleanPhone = verified.rawPhone;
   const msg = messageText ? encodeURIComponent(messageText.trim()) : '';
   return `https://api.whatsapp.com/send/?phone=${cleanPhone}${msg ? `&text=${msg}` : ''}`;

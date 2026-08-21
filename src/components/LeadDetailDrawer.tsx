@@ -330,9 +330,10 @@ export default function LeadDetailDrawer() {
 
             <button
               onClick={handleOpenWhatsApp}
-              className="flex-1 py-3 px-4 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-extrabold text-sm flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/25 active:scale-95 transition-all"
+              disabled={!verifiedPhone.hasWhatsApp || !verifiedPhone.rawPhone}
+              className="flex-1 py-3 px-4 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-extrabold text-sm flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/25 active:scale-95 transition-all disabled:opacity-40 disabled:cursor-not-allowed disabled:from-slate-800 disabled:to-slate-800 disabled:text-slate-500 disabled:shadow-none"
             >
-              <Send className="w-4 h-4 text-slate-950" /> Abrir WhatsApp Web ({verifiedPhone.formattedPhone})
+              <Send className="w-4 h-4" /> {verifiedPhone.hasWhatsApp && verifiedPhone.rawPhone ? `Abrir WhatsApp Web (${verifiedPhone.formattedPhone})` : 'Telefone Não Cadastrado'}
             </button>
           </div>
         </div>

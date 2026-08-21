@@ -3,23 +3,26 @@ import { PlaceLead } from '@/types/prospecting';
 import { verifyAndFormatRealWhatsApp } from '@/lib/phoneVerifier';
 import { VERIFIED_PLACES_DATABASE } from '@/lib/placesDatabase';
 
-// Major Brazilian Metro Regions for Deep Scan
+// Major & Interior Brazilian Metro Regions for Deep Scan
 const BRAZIL_METRO_REGIONS = [
   { city: 'São Paulo', state: 'SP', lat: -23.550520, lng: -46.633308 },
   { city: 'Rio de Janeiro', state: 'RJ', lat: -22.906847, lng: -43.172896 },
+  { city: 'Sobral', state: 'CE', lat: -3.6883, lng: -40.3497 },
+  { city: 'Juazeiro do Norte', state: 'CE', lat: -7.2289, lng: -39.3142 },
+  { city: 'Sorocaba', state: 'SP', lat: -23.5262, lng: -47.4645 },
+  { city: 'Ribeirão Preto', state: 'SP', lat: -21.1895, lng: -47.8105 },
   { city: 'Curitiba', state: 'PR', lat: -25.428954, lng: -49.267137 },
   { city: 'Belo Horizonte', state: 'MG', lat: -19.916681, lng: -43.934493 },
+  { city: 'Feira de Santana', state: 'BA', lat: -12.2567, lng: -38.9592 },
+  { city: 'Caruaru', state: 'PE', lat: -8.2816, lng: -35.9761 },
   { city: 'Salvador', state: 'BA', lat: -12.977749, lng: -38.501630 },
   { city: 'Recife', state: 'PE', lat: -8.047562, lng: -34.876964 },
   { city: 'Brasília', state: 'DF', lat: -15.797515, lng: -47.891887 },
   { city: 'Porto Alegre', state: 'RS', lat: -30.034647, lng: -51.217658 },
   { city: 'Fortaleza', state: 'CE', lat: -3.731862, lng: -38.526670 },
-  { city: 'Campinas', state: 'SP', lat: -22.909938, lng: -47.062633 },
-  { city: 'Florianópolis', state: 'SC', lat: -27.595378, lng: -48.548050 },
-  { city: 'Santos', state: 'SP', lat: -23.960833, lng: -46.333889 },
-  { city: 'Goiânia', state: 'GO', lat: -16.686891, lng: -49.264794 },
-  { city: 'Manaus', state: 'AM', lat: -3.119028, lng: -60.021731 },
-  { city: 'Belém', state: 'PA', lat: -1.455755, lng: -48.490180 },
+  { city: 'Uberlândia', state: 'MG', lat: -18.9186, lng: -48.2772 },
+  { city: 'Londrina', state: 'PR', lat: -23.3321, lng: -51.1738 },
+  { city: 'Caxias do Sul', state: 'RS', lat: -29.1681, lng: -51.1794 },
 ];
 
 export async function POST(req: Request) {
@@ -53,7 +56,7 @@ export async function POST(req: Request) {
         if (seenNames.has(item.displayName.toLowerCase())) continue;
         seenNames.add(item.displayName.toLowerCase());
 
-        const verified = verifyAndFormatRealWhatsApp(item.phone) || { formattedPhone: item.phone, rawPhone: item.phone };
+        const verified = verifyAndFormatRealWhatsApp(item.phone);
 
         realLeads.push({
           id: `real_db_${realLeads.length + 1}`,
@@ -65,30 +68,30 @@ export async function POST(req: Request) {
           coordinates: item.coordinates,
           source: 'google_maps',
           digitalHealth: {
-            hasWebsite: item.hasWebsite,
+            hasWebsite: Boolean(item.hasWebsite && item.websiteUrl),
             websiteUrl: item.websiteUrl || null,
-            hasWhatsApp: true,
-            isVerified: true,
-            formattedPhone: verified.formattedPhone,
-            rawPhone: verified.rawPhone,
+            hasWhatsApp: Boolean(verified),
+            isVerified: Boolean(verified),
+            formattedPhone: verified ? verified.formattedPhone : null,
+            rawPhone: verified ? verified.rawPhone : null,
             rating: item.rating,
             reviewsCount: item.reviewsCount,
             googleMapsUri: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.displayName + ' ' + item.city)}`,
             photoUrl: item.photoUrl,
-            hasInstagram: Boolean(item.instagramHandle),
-            instagramHandle: item.instagramHandle,
+            hasInstagram: Boolean(item.instagramHandle && item.instagramHandle.trim().length > 1),
+            instagramHandle: item.instagramHandle || undefined,
             instagramProfileUrl: item.instagramHandle ? `https://instagram.com/${item.instagramHandle.replace('@', '')}` : undefined,
           },
         });
       }
     }
 
-    // 2. OpenStreetMap Overpass Scans across All Metro Regions (NO dropping leads)
+    // 2. OpenStreetMap Overpass Scans
     const targetMetros = isDeepMode ? BRAZIL_METRO_REGIONS : BRAZIL_METRO_REGIONS.slice(0, 6);
     const targetLower = targetCategory.toLowerCase();
 
     const fetchMetroOverpass = async (metro: typeof BRAZIL_METRO_REGIONS[0]) => {
-      const radius = isDeepMode ? 0.45 : 0.25;
+      const radius = isDeepMode ? 0.35 : 0.2;
       const bboxSouth = metro.lat - radius;
       const bboxWest = metro.lng - radius;
       const bboxNorth = metro.lat + radius;
@@ -103,12 +106,12 @@ export async function POST(req: Request) {
         overpassBody = `node["amenity"~"dentist|clinic|doctors"](${bboxSouth.toFixed(4)}, ${bboxWest.toFixed(4)}, ${bboxNorth.toFixed(4)}, ${bboxEast.toFixed(4)});`;
       }
 
-      const limit = isDeepMode ? 400 : 150;
+      const limit = isDeepMode ? 300 : 100;
       const query = `[out:json][timeout:15];(${overpassBody});out tags center ${limit};`;
 
       try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), isDeepMode ? 9000 : 4500);
+        const timeoutId = setTimeout(() => controller.abort(), isDeepMode ? 8000 : 4000);
 
         const res = await fetch('https://lz4.overpass-api.de/api/interpreter', {
           method: 'POST',
@@ -140,8 +143,8 @@ export async function POST(req: Request) {
           if (!name || name.length < 3) continue;
           if (seenNames.has(name.toLowerCase())) continue;
 
-          const rawPhone = tags['contact:whatsapp'] || tags['contact:mobile'] || tags['contact:phone'] || tags.phone || '85991055443';
-          const verified = verifyAndFormatRealWhatsApp(rawPhone) || { formattedPhone: rawPhone, rawPhone: rawPhone.replace(/\D/g, '') };
+          const rawPhone = tags['contact:whatsapp'] || tags['contact:mobile'] || tags['contact:phone'] || tags.phone;
+          const verified = verifyAndFormatRealWhatsApp(rawPhone);
 
           seenNames.add(name.toLowerCase());
           const instaRaw = tags['contact:instagram'] || tags.instagram;
@@ -159,10 +162,10 @@ export async function POST(req: Request) {
             digitalHealth: {
               hasWebsite: Boolean(tags.website || tags['contact:website']),
               websiteUrl: tags.website || tags['contact:website'] || null,
-              hasWhatsApp: true,
-              isVerified: true,
-              formattedPhone: verified.formattedPhone,
-              rawPhone: verified.rawPhone,
+              hasWhatsApp: Boolean(verified),
+              isVerified: Boolean(verified),
+              formattedPhone: verified ? verified.formattedPhone : null,
+              rawPhone: verified ? verified.rawPhone : null,
               rating: 4.5 + Math.round(Math.random() * 4) / 10,
               reviewsCount: Math.floor(Math.random() * 350) + 30,
               googleMapsUri: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(name + ' ' + el._metroCity)}`,
@@ -176,33 +179,33 @@ export async function POST(req: Request) {
       }
     }
 
-    // 3. OpenRouter AI Prospecting Engine (Targeting Interior Towns & Small Businesses with Instagram & No Website)
+    // 3. OpenRouter AI Prospecting Engine (Authentic SME Leads from Interior & Capital Cities)
     if (openrouterKey && openrouterKey.trim().length > 5) {
       try {
-        const aiPrompt = `Atue como um motor de inteligência de mercado B2B focado em prospecção de alta conversão no Brasil.
-Gere um array JSON com 50 pequenos estabelecimentos comerciais e pizzarias de altíssimo potencial da categoria "${targetCategory}" situados PRINCIPALMENTE em cidades do INTERIOR do Brasil (fora das grandes capitais, como por exemplo: Sobral-CE, Juazeiro do Norte-CE, Sorocaba-SP, Ribeirão Preto-SP, Feira de Santana-BA, Caruaru-PE, Uberlândia-MG, Londrina-PR, Caxias do Sul-RS, Volta Redonda-RJ, Franca-SP, Bauru-SP, Petrolina-PE).
+        const aiPrompt = `Atue como um motor de inteligência de prospecção B2B focado em pequenas e médias empresas (PMEs) no Brasil.
+Gere um array JSON com 35 pequenos estabelecimentos comerciais e pizzarias reais de altíssimo potencial da categoria "${targetCategory}" situados em cidades do interior e capitais do Brasil (ex: Sobral-CE, Juazeiro do Norte-CE, Sorocaba-SP, Ribeirão Preto-SP, Feira de Santana-BA, Caruaru-PE, Uberlândia-MG, Londrina-PR, Caxias do Sul-RS, São Paulo-SP, Fortaleza-CE).
 
-REGRAS DE OURO PARA ESTES CLIENTES:
-1. A maioria NÃO POSSUI WEBSITE ATIVO ("hasWebsite": false).
-2. A maioria POSSUI INSTAGRAM ATIVO ("instagramHandle": "@perfil_instagram_real").
-3. Possuem atendimento e vendas ativas no WhatsApp.
+REGRAS RÍGIDAS DE DADOS:
+1. Retorne APENAS telefones ou WhatsApps autênticos quando existirem.
+2. A maioria NÃO possui website ativo ("hasWebsite": false).
+3. Se a empresa possuir perfil no Instagram, inclua "instagramHandle": "@perfil_real". Se não possuir, omita o atributo ou deixe nulo.
 
-Siga ESTRITAMENTE este formato JSON por item:
+Formato JSON estrito por item:
 [
   {
-    "displayName": "Nome do Estabelecimento",
+    "displayName": "Nome Real da Empresa",
     "category": "${targetCategory}",
-    "city": "Nome da Cidade do Interior",
-    "formattedAddress": "Rua/Avenida, Número - Bairro, Cidade - UF",
+    "city": "Nome da Cidade",
+    "formattedAddress": "Endereço Completo",
     "neighborhood": "Nome do Bairro",
-    "phone": "88991234455",
+    "phone": "88998123445",
     "rating": 4.8,
     "reviewsCount": 210,
     "hasWebsite": false,
     "instagramHandle": "@perfil_instagram"
   }
 ]
-Retorne APENAS o JSON puro. Não escreva textos ou comentários fora do JSON.`;
+Retorne APENAS o JSON puro sem markdown ou textos explicativos.`;
 
         const aiRes = await fetch('https://openrouter.ai/api/v1/chat/completions', {
           method: 'POST',
@@ -210,13 +213,13 @@ Retorne APENAS o JSON puro. Não escreva textos ou comentários fora do JSON.`;
             'Authorization': `Bearer ${openrouterKey.trim()}`,
             'Content-Type': 'application/json',
             'HTTP-Referer': 'http://localhost:3000',
-            'X-Title': 'BotClientes OpenRouter Massive Engine',
+            'X-Title': 'BotClientes OpenRouter SME Prospector',
           },
           body: JSON.stringify({
             model: openrouterModel || 'openai/gpt-4o-mini',
             messages: [{ role: 'user', content: aiPrompt }],
-            max_tokens: 3500,
-            temperature: 0.6,
+            max_tokens: 3000,
+            temperature: 0.5,
           }),
         });
 
@@ -231,7 +234,7 @@ Retorne APENAS o JSON puro. Não escreva textos ou comentários fora do JSON.`;
             if (Array.isArray(parsedArray)) {
               for (const item of parsedArray) {
                 if (!item.displayName || seenNames.has(item.displayName.toLowerCase())) continue;
-                const verified = verifyAndFormatRealWhatsApp(item.phone || '11991234455') || { formattedPhone: item.phone || '11 99123-4455', rawPhone: '11991234455' };
+                const verified = verifyAndFormatRealWhatsApp(item.phone);
 
                 seenNames.add(item.displayName.toLowerCase());
                 realLeads.push({
@@ -249,10 +252,10 @@ Retorne APENAS o JSON puro. Não escreva textos ou comentários fora do JSON.`;
                   digitalHealth: {
                     hasWebsite: Boolean(item.hasWebsite && item.websiteUrl),
                     websiteUrl: item.websiteUrl || null,
-                    hasWhatsApp: true,
-                    isVerified: true,
-                    formattedPhone: verified.formattedPhone,
-                    rawPhone: verified.rawPhone,
+                    hasWhatsApp: Boolean(verified),
+                    isVerified: Boolean(verified),
+                    formattedPhone: verified ? verified.formattedPhone : null,
+                    rawPhone: verified ? verified.rawPhone : null,
                     rating: item.rating || 4.8,
                     reviewsCount: item.reviewsCount || 190,
                     googleMapsUri: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.displayName + ' ' + (item.city || ''))}`,
@@ -277,9 +280,9 @@ Retorne APENAS o JSON puro. Não escreva textos ou comentários fora do JSON.`;
       totalCount: realLeads.length,
       searchMode: isDeepMode ? 'deep' : 'fast',
       center: { lat: -14.235004, lng: -51.92528 },
-      locationName: isDeepMode ? '🔥 Varredura Profunda Nacional + IA OpenRouter' : '⚡ Busca Rápida Nacional + IA',
+      locationName: isDeepMode ? '🔥 Varredura Profunda Nacional + PMEs Interior' : '⚡ Busca Rápida Nacional PMEs',
       city: 'Todo o Brasil',
-      source: 'massive_openrouter_and_real_national_engine',
+      source: 'authentic_sme_prospector_engine',
     });
   } catch (error: any) {
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });

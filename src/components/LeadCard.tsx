@@ -149,15 +149,27 @@ export default function LeadCard({ lead }: LeadCardProps) {
         </button>
 
         {/* WhatsApp Direct Link */}
-        <a
-          href={whatsappUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="py-2 px-3.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-extrabold flex items-center justify-center gap-1.5 shadow-md shadow-emerald-500/20 transition-all active:scale-95"
-          title="Disparar mensagem no WhatsApp Web"
-        >
-          <MessageCircle className="w-4 h-4 fill-slate-950 text-slate-950" /> WhatsApp
-        </a>
+        {digitalHealth.hasWhatsApp && digitalHealth.rawPhone ? (
+          <a
+            href={whatsappUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="py-2 px-3.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-extrabold flex items-center justify-center gap-1.5 shadow-md shadow-emerald-500/20 transition-all active:scale-95"
+            title="Disparar mensagem no WhatsApp Web"
+          >
+            <MessageCircle className="w-4 h-4 fill-slate-950 text-slate-950" /> WhatsApp
+          </a>
+        ) : (
+          <a
+            href={digitalHealth.googleMapsUri}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="py-2 px-2.5 rounded-xl bg-slate-900/90 text-slate-400 text-[11px] font-medium flex items-center justify-center gap-1 border border-slate-800"
+            title="Telefone não cadastrado no Maps. Clique para buscar no Google Maps"
+          >
+            <Phone className="w-3 h-3 text-slate-500" /> Sem Zap
+          </a>
+        )}
 
         {/* Instagram Profile Direct Link */}
         {digitalHealth.instagramProfileUrl && (

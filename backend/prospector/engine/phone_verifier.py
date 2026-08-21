@@ -13,23 +13,19 @@ VALID_DDDS = {
     '91', '92', '93', '94', '95', '96', '97', '98', '99'
 }
 
-def verify_and_format_real_whatsapp(raw_phone: Optional[str]) -> Dict[str, Any]:
+def verify_and_format_real_whatsapp(raw_phone: Optional[str]) -> Optional[Dict[str, Any]]:
     """
-    Universal Brazilian Phone Formatter (+55)
-    Takes ANY raw phone number input, cleans non-digits, prepends country code 55,
-    formats mobile (+55 (DD) 9XXXX-XXXX) or landline, and generates a valid WhatsApp link.
+    Universal Authentic Brazilian Phone Formatter (+55)
+    Formats ONLY real phone numbers provided by source data.
+    If raw_phone is missing or invalid, returns None (NO fake or fallback numbers!).
     """
-    if not raw_phone or not str(raw_phone).strip():
-        return {
-            'formattedPhone': '+55 (11) 99123-4455',
-            'rawPhone': '5511991234455',
-            'hasWhatsApp': True,
-            'isVerified': True,
-            'ddd': '11',
-            'waUrl': 'https://api.whatsapp.com/send/?phone=5511991234455',
-        }
+    if not raw_phone or not str(raw_phone).strip() or len(str(raw_phone).strip()) < 8:
+        return None
 
     digits = re.sub(r'\D', '', str(raw_phone))
+
+    if len(digits) < 8:
+        return None
 
     if digits.startswith('0'):
         digits = digits[1:]
@@ -43,16 +39,16 @@ def verify_and_format_real_whatsapp(raw_phone: Optional[str]) -> Dict[str, Any]:
         if rest[0] in ['6', '7', '8', '9']:
             digits = f"{ddd}9{rest}"
 
-    ddd = digits[:2] if len(digits) >= 2 else '11'
+    if len(digits) < 10:
+        return None
+
+    ddd = digits[:2]
     if ddd not in VALID_DDDS:
-        ddd = '11'
+        return None
 
-    num = digits[2:] if len(digits) > 2 else '991234455'
+    num = digits[2:]
     if len(num) < 8:
-        num = '991234455'
-
-    if len(num) == 8 and num[0] in ['6', '7', '8', '9']:
-        num = f"9{num}"
+        return None
 
     full_international = f"55{ddd}{num}"
 
