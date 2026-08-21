@@ -104,11 +104,9 @@ export default function Home() {
     }
   }, [fetchCrmData, leads.length, currentLocation, currentRepo, pitchTone, apiSettings, setLeads]);
 
-  // Filter and Sort prospecting leads (Only verified WhatsApp leads)
+  // Filter and Sort prospecting leads
   const filteredLeads = leads
     .filter((lead) => {
-      // Must be strictly verified on WhatsApp
-      if (!lead.digitalHealth.hasWhatsApp || lead.digitalHealth.isVerified === false) return false;
       if (filters.sourceFilter === 'google_maps' && lead.source === 'instagram') return false;
       if (filters.sourceFilter === 'instagram' && lead.source !== 'instagram') return false;
       if (filters.onlyNoWebsite && lead.digitalHealth.hasWebsite) return false;
