@@ -47,8 +47,7 @@ export default function Home() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               location: currentLocation,
-              category: 'Hamburgueria',
-              searchMode: 'deep',
+              category: 'Todas',
               openrouterApiKey: apiSettings.openrouterApiKey || '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',
             }),
           });

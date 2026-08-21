@@ -409,8 +409,9 @@ export default function SearchFilters() {
           <div className="flex flex-wrap items-center gap-1.5 bg-slate-900/90 border border-slate-800 p-1 rounded-xl">
             <span className="text-[11px] text-cyan-400 font-extrabold px-2">Nicho:</span>
             {[
-              { label: '🍔 Burgers', val: 'Hamburgueria' },
+              { label: '✨ Todas as PMEs', val: 'Todas' },
               { label: '🍕 Pizzarias', val: 'Pizzaria' },
+              { label: '🍔 Hamburguerias', val: 'Hamburgueria' },
               { label: '💈 Barbearias', val: 'Barbearia' },
               { label: '🍽️ Restaurantes', val: 'Restaurante' },
               { label: '🚗 Oficinas', val: 'Oficina Mecânica' },
@@ -423,8 +424,8 @@ export default function SearchFilters() {
                   handleSearchLeads(undefined, undefined, niche.val);
                 }}
                 className={`text-[11px] px-2.5 py-1 rounded-lg font-bold transition-all active:scale-95 ${
-                  filters.categoryFilter === niche.val
-                    ? 'bg-cyan-500 text-slate-950 shadow-sm'
+                  (filters.categoryFilter || 'Todas') === niche.val
+                    ? 'bg-cyan-500 text-slate-950 shadow-sm font-black'
                     : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800'
                 }`}
               >
