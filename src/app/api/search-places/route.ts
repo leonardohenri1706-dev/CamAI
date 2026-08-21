@@ -242,8 +242,8 @@ Retorne APENAS o JSON puro. Não escreva textos ou comentários fora do JSON.`;
                   },
                   source: 'google_maps',
                   digitalHealth: {
-                    hasWebsite: Boolean(item.hasWebsite),
-                    websiteUrl: item.hasWebsite ? `https://${item.displayName.toLowerCase().replace(/[^a-z0-9]/g, '')}.com.br` : null,
+                    hasWebsite: Boolean(item.hasWebsite && item.websiteUrl),
+                    websiteUrl: item.websiteUrl || null,
                     hasWhatsApp: true,
                     isVerified: true,
                     formattedPhone: verified.formattedPhone,
@@ -252,9 +252,9 @@ Retorne APENAS o JSON puro. Não escreva textos ou comentários fora do JSON.`;
                     reviewsCount: item.reviewsCount || 190,
                     googleMapsUri: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.displayName + ' ' + (item.city || ''))}`,
                     photoUrl: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800&auto=format&fit=crop&q=80',
-                    hasInstagram: Boolean(item.instagramHandle),
-                    instagramHandle: item.instagramHandle || `@${item.displayName.toLowerCase().replace(/[^a-z0-9]/g, '')}`,
-                    instagramProfileUrl: `https://instagram.com/${(item.instagramHandle || item.displayName).toLowerCase().replace(/[^a-z0-9]/g, '')}`,
+                    hasInstagram: Boolean(item.instagramHandle && item.instagramHandle.trim().length > 1),
+                    instagramHandle: item.instagramHandle ? item.instagramHandle.trim() : undefined,
+                    instagramProfileUrl: item.instagramHandle ? `https://instagram.com/${item.instagramHandle.replace('@', '').trim()}` : undefined,
                   },
                 });
               }
