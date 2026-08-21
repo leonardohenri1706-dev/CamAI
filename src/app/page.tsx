@@ -112,6 +112,10 @@ export default function Home() {
   // Filter and Sort prospecting leads
   const filteredLeads = leads
     .filter((lead) => {
+      // REQUIREMENT: Strict WhatsApp verification check before lead appears
+      if (!lead.digitalHealth.hasWhatsApp || !lead.digitalHealth.rawPhone) {
+        return false;
+      }
       if (filters.sourceFilter === 'google_maps' && lead.source === 'instagram') return false;
       if (filters.sourceFilter === 'instagram' && lead.source !== 'instagram') return false;
       if (filters.onlyNoWebsite && lead.digitalHealth.hasWebsite) return false;

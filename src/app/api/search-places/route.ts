@@ -196,6 +196,7 @@ export async function POST(req: Request) {
 
           const rawPhone = tags['contact:whatsapp'] || tags['contact:mobile'] || tags['contact:phone'] || tags.phone;
           const verified = verifyAndFormatRealWhatsApp(rawPhone);
+          if (!verified || !verified.hasWhatsApp || !verified.rawPhone) continue;
 
           seenNames.add(name.toLowerCase());
           const instaRaw = tags['contact:instagram'] || tags.instagram;
@@ -291,7 +292,8 @@ Retorne APENAS o JSON puro sem markdown ou textos explicativos.`;
               for (const item of parsedArray) {
                 if (realLeads.length >= 10000) break;
                 if (!item.displayName || seenNames.has(item.displayName.toLowerCase())) continue;
-                const verified = verifyAndFormatRealWhatsApp(item.phone);
+        const verified = verifyAndFormatRealWhatsApp(item.phone);
+        if (!verified || !verified.hasWhatsApp || !verified.rawPhone) continue;
 
                 seenNames.add(item.displayName.toLowerCase());
                 realLeads.push({
