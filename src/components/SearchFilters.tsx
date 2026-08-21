@@ -309,130 +309,21 @@ export default function SearchFilters() {
   return (
     <div className="w-full glass-panel rounded-2xl p-4 border border-slate-800/80 shadow-lg space-y-3">
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-        {/* Location Selector & Autocomplete Field */}
+        {/* Nationwide Prospecting Header */}
         <div className="flex-1 space-y-2">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 text-xs font-semibold text-slate-300">
-              <MapPin className="w-4 h-4 text-cyan-400" />
-              <span>Etapa 2: Localização Alvo com Autocomplete no Maps</span>
+            <div className="flex items-center gap-2 text-xs font-bold text-slate-100">
+              <Globe className="w-4 h-4 text-emerald-400" />
+              <span>Etapa 2: Prospecção Nacional de Clientes em Potencial (Todo o Brasil)</span>
             </div>
-            <span className="text-[11px] text-emerald-400 font-medium flex items-center gap-1">
-              <Compass className="w-3 h-3" /> Sugestões em Tempo Real
+            <span className="text-[11px] text-emerald-400 font-extrabold flex items-center gap-1 bg-emerald-950/80 border border-emerald-700/60 px-2.5 py-0.5 rounded-full">
+              <CheckCircle2 className="w-3 h-3 text-emerald-400" /> Cobertura Nacional Ativa
             </span>
           </div>
 
-          {/* Preset Location Chips + Add Location Button */}
-          <div className="flex flex-wrap items-center gap-2">
-            {/* Prominent Todo o Brasil Quick Search Button */}
-            <button
-              onClick={() => {
-                const brLoc: SearchLocation = {
-                  name: '🇧🇷 Todo o Brasil (Busca Rápida)',
-                  city: 'Todo o Brasil',
-                  state: 'BR',
-                  center: { lat: -14.235004, lng: -51.92528 },
-                  zoom: 4,
-                };
-                handleSelectPreset(brLoc);
-              }}
-              className={`text-xs px-3.5 py-1.5 rounded-xl border transition-all flex items-center gap-1.5 shadow-md active:scale-95 ${
-                currentLocation.city === 'Todo o Brasil'
-                  ? 'bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 text-slate-950 font-black border-emerald-400 ring-2 ring-emerald-500/50'
-                  : 'bg-emerald-950/60 hover:bg-emerald-900/70 text-emerald-300 border-emerald-800/80 font-bold'
-              }`}
-              title="Buscar e mapear clientes com WhatsApp verificado em todo o território nacional"
-            >
-              <Globe className="w-3.5 h-3.5" />
-              <span>🇧🇷 Todo o Brasil (Nacional)</span>
-            </button>
-
-            {locations.filter((loc) => loc.city !== 'Todo o Brasil').slice(0, 6).map((loc) => (
-              <button
-                key={loc.name}
-                onClick={() => handleSelectPreset(loc)}
-                className={`text-xs px-3 py-1.5 rounded-xl border transition-all flex items-center gap-1.5 active:scale-95 ${
-                  currentLocation.name === loc.name && !customCityInput && currentLocation.city !== 'Todo o Brasil'
-                    ? 'bg-gradient-to-r from-cyan-950 to-blue-950 text-cyan-300 border-cyan-600 font-semibold shadow-sm'
-                    : 'bg-slate-900/80 hover:bg-slate-800 text-slate-400 border-slate-800'
-                }`}
-              >
-                <MapPin className="w-3 h-3 text-cyan-400" />
-                {loc.name}
-              </button>
-            ))}
-
-            {/* Button to Open Add Location Modal */}
-            <button
-              onClick={() => setIsAddLocationOpen(true)}
-              className="text-xs px-3 py-1.5 rounded-xl bg-cyan-950/70 hover:bg-cyan-900/70 text-cyan-300 border border-cyan-800/60 font-semibold flex items-center gap-1 transition-all active:scale-95 shadow-sm"
-              title="Adicionar e salvar nova cidade/bairro no Django"
-            >
-              <Plus className="w-3.5 h-3.5" /> Adicionar Cidade
-            </button>
-          </div>
-
-          {/* Autocomplete Search Input with Live Dropdown */}
-          <div ref={searchContainerRef} className="relative max-w-lg pt-1">
-            <div className="relative">
-              <Search className="w-3.5 h-3.5 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
-              <input
-                type="text"
-                value={customCityInput}
-                onChange={(e) => handleInputChange(e.target.value)}
-                onFocus={() => suggestions.length > 0 && setIsDropdownOpen(true)}
-                onKeyDown={handleKeyDown}
-                placeholder="Comece a digitar uma cidade ou bairro (ex: Moema, Copacabana, Campinas, Curitiba)..."
-                className="w-full pl-8 pr-8 py-2 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-200 placeholder:text-slate-500 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-all"
-              />
-              {isLoadingSuggestions && (
-                <Loader2 className="w-3.5 h-3.5 text-cyan-400 animate-spin absolute right-3 top-1/2 -translate-y-1/2" />
-              )}
-            </div>
-
-            {/* Floating Autocomplete Suggestions Dropdown */}
-            {isDropdownOpen && suggestions.length > 0 && (
-              <div className="absolute top-full left-0 right-0 mt-1.5 z-50 bg-slate-900/95 backdrop-blur-xl border border-slate-800 rounded-2xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
-                <div className="px-3 py-1.5 bg-slate-950/80 border-b border-slate-800 text-[10px] font-semibold text-slate-400 flex items-center justify-between">
-                  <span>SUGESTÕES DO MAPS ({suggestions.length})</span>
-                  <span className="text-slate-500 font-mono">↑↓ para navegar • Enter para selecionar</span>
-                </div>
-
-                <div className="max-h-60 overflow-y-auto divide-y divide-slate-800/40">
-                  {suggestions.map((sug, idx) => (
-                    <button
-                      key={idx}
-                      onClick={() => handleSelectSuggestion(sug)}
-                      onMouseEnter={() => setSelectedIndex(idx)}
-                      className={`w-full text-left px-3.5 py-2.5 flex items-center justify-between gap-3 transition-colors ${
-                        selectedIndex === idx
-                          ? 'bg-cyan-950/80 text-cyan-200'
-                          : 'hover:bg-slate-800/60 text-slate-300'
-                      }`}
-                    >
-                      <div className="flex items-center gap-2.5 min-w-0">
-                        <span className="p-1.5 rounded-lg bg-slate-800 text-cyan-400 shrink-0">
-                          <MapPin className="w-3.5 h-3.5" />
-                        </span>
-                        <div className="truncate">
-                          <span className="text-xs font-semibold text-slate-100 block truncate">
-                            {sug.name}
-                          </span>
-                          <span className="text-[10px] text-slate-400 block truncate">
-                            {sug.city}
-                          </span>
-                        </div>
-                      </div>
-
-                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-950 border border-slate-800 text-slate-400 shrink-0 flex items-center gap-1 font-mono">
-                        <Navigation className="w-2.5 h-2.5 text-cyan-400" />
-                        Maps
-                      </span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
+          <p className="text-xs text-slate-400">
+            A busca vasculha o Brasil inteiro sem restrição de localização para encontrar e ranquear os melhores estabelecimentos comerciais.
+          </p>
         </div>
 
         {/* Search Trigger Button */}
@@ -443,11 +334,11 @@ export default function SearchFilters() {
         >
           {isSearchingLeads ? (
             <>
-              <Loader2 className="w-4 h-4 animate-spin text-slate-950" /> Buscando no Maps...
+              <Loader2 className="w-4 h-4 animate-spin text-slate-950" /> Buscando no Brasil...
             </>
           ) : (
             <>
-              <Search className="w-4 h-4 text-slate-950" /> Buscar & Analisar Leads
+              <Search className="w-4 h-4 text-slate-950" /> Buscar & Analisar Leads (Nacional)
             </>
           )}
         </button>

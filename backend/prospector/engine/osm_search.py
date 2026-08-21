@@ -117,7 +117,7 @@ def search_real_places_with_python(
     real_leads: List[Dict[str, Any]] = []
     seen_names = set()
 
-    is_national = any(k in clean_city_lower for k in ['brasil', 'brazil', 'nacional', 'todo o brasil'])
+    is_national = True
 
     # 1. Primary Source: Verified Real Places Catalog
     for item in VERIFIED_PLACES_CATALOG:

@@ -35,12 +35,8 @@ export async function POST(req: Request) {
     const queryStr = (customQuery || location?.name || location?.city || 'São Paulo').trim();
     const cleanLower = queryStr.toLowerCase();
 
-    const isNational =
-      cleanLower.includes('brasil') ||
-      cleanLower.includes('brazil') ||
-      cleanLower.includes('nacional') ||
-      location?.state === 'BR' ||
-      location?.city === 'Todo o Brasil';
+    // Nationwide search mode enabled as default for all queries
+    const isNational = true;
 
     // Geocode target city without default Fortaleza bias
     let matchedLocation = location?.center ? { lat: location.center.lat, lng: location.center.lng, city: location.city, state: location.state || 'BR' } : null;

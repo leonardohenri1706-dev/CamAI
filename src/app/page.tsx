@@ -153,7 +153,7 @@ export default function Home() {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2 text-xs font-semibold text-slate-300">
                     <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
-                    <span>Mapa Interativo • {currentLocation.name}</span>
+                    <span>Mapa de Cobertura Nacional • Brasil</span>
                   </div>
                   <span className="text-[11px] text-slate-400">
                     {filteredLeads.length} estabelecimentos reais
