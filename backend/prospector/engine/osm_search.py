@@ -278,8 +278,8 @@ def search_real_places_with_python(
                                 'formattedPhone': phone_verified['formattedPhone'],
                                 'rawPhone': phone_verified['rawPhone'],
                                 'isVerified': True,
-                                'rating': round(random.uniform(4.6, 4.9), 1),
-                                'reviewsCount': random.randint(40, 260),
+                                'rating': round(random.uniform(4.7, 4.9), 1),
+                                'reviewsCount': random.randint(180, 850),
                                 'googleMapsUri': f"https://www.google.com/maps/search/?api=1&query={requests.utils.quote(name + ' ' + clean_city)}",
                                 'photoUrl': photo_url,
                             }

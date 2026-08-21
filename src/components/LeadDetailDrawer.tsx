@@ -264,11 +264,11 @@ export default function LeadDetailDrawer() {
                 </div>
 
                 {/* Reviews Factor */}
-                <div className="p-3 rounded-xl bg-slate-900/90 border border-slate-800 text-center">
-                  <Star className="w-4 h-4 text-amber-400 mx-auto mb-1" />
-                  <span className="text-[10px] text-slate-400 block font-medium">Avaliações</span>
-                  <span className="text-xs font-bold text-amber-300">
-                    {digitalHealth.rating} ★ ({digitalHealth.reviewsCount})
+                <div className="p-3 rounded-xl bg-amber-950/40 border border-amber-800/60 text-center">
+                  <Star className="w-4 h-4 fill-amber-400 text-amber-400 mx-auto mb-1" />
+                  <span className="text-[10px] text-amber-300/80 block font-medium">Grandes Avaliações</span>
+                  <span className="text-xs font-black text-amber-300">
+                    {typeof digitalHealth.rating === 'number' ? digitalHealth.rating.toFixed(1) : digitalHealth.rating} ★ ({digitalHealth.reviewsCount})
                   </span>
                 </div>
 

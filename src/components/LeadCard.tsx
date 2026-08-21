@@ -135,9 +135,11 @@ export default function LeadCard({ lead }: LeadCardProps) {
             </a>
           )}
 
-          {/* Rating */}
-          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-slate-900 text-amber-300 border border-slate-800">
-            <Star className="w-3 h-3 fill-amber-400 text-amber-400" /> {digitalHealth.rating} ({digitalHealth.reviewsCount})
+          {/* Rating & Grandes Avaliações */}
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-amber-950/80 text-amber-300 border border-amber-800/60 font-bold shadow-sm">
+            <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400 shrink-0" />
+            <span>{typeof digitalHealth.rating === 'number' ? digitalHealth.rating.toFixed(1) : digitalHealth.rating}</span>
+            <span className="text-amber-200/80 text-[10px]">({digitalHealth.reviewsCount} avaliações no Maps)</span>
           </span>
         </div>
 
