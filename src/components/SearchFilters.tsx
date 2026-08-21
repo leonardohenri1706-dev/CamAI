@@ -501,14 +501,17 @@ export default function SearchFilters() {
             <span>🍕 Interior + Insta sem Site (Oportunidade Ouro)</span>
           </button>
 
-          {/* Quick Filter: Traditional SMBs (< 600 reviews) */}
+          {/* Quick Filter: Instagram Direct Prospecting */}
           <button
-            onClick={() => setFilters({ onlyNoWebsite: true, sortBy: 'score' })}
-            className="px-3 py-1.5 rounded-xl border bg-amber-950/80 hover:bg-amber-900/90 text-amber-300 border-amber-700/80 font-bold transition-all flex items-center gap-1.5 shadow-sm active:scale-95"
-            title="Recomendar em 1º lugar pequenas e médias empresas tradicionais com menos de 600 avaliações sem site próprio"
+            onClick={() => setFilters({ sourceFilter: filters.sourceFilter === 'instagram' ? 'all' : 'instagram' })}
+            className={`px-3 py-1.5 rounded-xl border transition-all flex items-center gap-1.5 active:scale-95 ${
+              filters.sourceFilter === 'instagram'
+                ? 'bg-gradient-to-r from-pink-600 to-purple-600 text-white border-pink-400 font-extrabold shadow-md'
+                : 'bg-slate-900/80 text-pink-300 border-slate-800 hover:text-white'
+            }`}
+            title="Filtrar PMEs ativas com perfil autêntico no Instagram para prospecção via Direct DM"
           >
-            <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
-            <span>🏆 PMEs Tradicionais (&lt; 600 Avaliações) em 1º Lugar</span>
+            <span>📸 Prospecção via Instagram Direct</span>
           </button>
 
           {/* Minimum Reviews Selector */}

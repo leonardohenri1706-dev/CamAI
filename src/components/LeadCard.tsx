@@ -148,7 +148,7 @@ export default function LeadCard({ lead }: LeadCardProps) {
           <Eye className="w-3.5 h-3.5 text-cyan-400" /> Pitch & Detalhes
         </button>
 
-        {/* WhatsApp Direct Link */}
+        {/* Contact Action: WhatsApp or Instagram Direct */}
         {digitalHealth.hasWhatsApp && digitalHealth.rawPhone ? (
           <a
             href={whatsappUrl}
@@ -159,26 +159,36 @@ export default function LeadCard({ lead }: LeadCardProps) {
           >
             <MessageCircle className="w-4 h-4 fill-slate-950 text-slate-950" /> WhatsApp
           </a>
+        ) : digitalHealth.hasInstagram && digitalHealth.instagramProfileUrl ? (
+          <a
+            href={digitalHealth.instagramProfileUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="py-2 px-3.5 rounded-xl bg-gradient-to-r from-pink-600 via-purple-600 to-indigo-600 hover:from-pink-500 hover:to-indigo-500 text-white text-xs font-extrabold flex items-center justify-center gap-1.5 shadow-md shadow-pink-600/20 transition-all active:scale-95"
+            title="Abrir perfil e prospectar via Direct no Instagram"
+          >
+            📸 Direct Insta
+          </a>
         ) : (
           <a
             href={digitalHealth.googleMapsUri}
             target="_blank"
             rel="noopener noreferrer"
             className="py-2 px-2.5 rounded-xl bg-slate-900/90 text-slate-400 text-[11px] font-medium flex items-center justify-center gap-1 border border-slate-800"
-            title="Telefone não cadastrado no Maps. Clique para buscar no Google Maps"
+            title="Telefone não cadastrado. Clique para ver no Google Maps"
           >
-            <Phone className="w-3 h-3 text-slate-500" /> Sem Zap
+            <Phone className="w-3 h-3 text-slate-500" /> Sem Contato
           </a>
         )}
 
-        {/* Instagram Profile Direct Link */}
-        {digitalHealth.instagramProfileUrl && (
+        {/* Instagram Badge Link (if WhatsApp is active) */}
+        {digitalHealth.hasWhatsApp && digitalHealth.instagramProfileUrl && (
           <a
             href={digitalHealth.instagramProfileUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="p-2 rounded-xl bg-pink-950/60 hover:bg-pink-900/80 text-pink-300 border border-pink-800/60 transition-all"
-            title="Abrir perfil no Instagram"
+            title={`Abrir perfil no Instagram (${digitalHealth.instagramHandle})`}
           >
             📸
           </a>
